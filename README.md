@@ -2,7 +2,7 @@
 
 El objetivo del proyecto es demostrar los riesgos de seguridad asociados al uso de generadores de números pseudoaleatorios (PRNG) matemáticos en lógicas críticas de negocio (como la generación de tokens para reseteo de contraseñas) y proponer una solución robusta basada en la captura de entropía híbrida del mundo físico y de la mecánica cuántica.
 
-El proyecto simula un escenario real: una API con autenticación y almacenamiento en memoria (SQLite en RAM) que contiene un usuario administrador, y un script de ataque capaz de secuestrar dicha cuenta cuando se utiliza el método de aleatoriedad vulnerable, pero que falla completamente frente a nuestro método seguro.
+El proyecto simula un escenario real: una API con autenticación y almacenamiento en memoria (SQLite en RAM) que contiene un usuario administrador, y un script de ataque capaz de secuestrar dicha cuenta cuando se utiliza el método de aleatoriedad vulnerable, pero que falla completamente frente al método seguro.
 
 ## Estructura del Repositorio
 
@@ -36,7 +36,7 @@ En lugar de calcular una posición mediante software tradicional, se delega la d
 
 1. Se inicializa un circuito cuántico donde cada qubit se somete a una **Compuerta Hadamard (H)**.
 2. Esta compuerta coloca a los qubits en un estado de **superposición perfecta** (una probabilidad exacta del 50% de colapsar en 0 y 50% de colapsar en 1).
-3. Al realizar la medición (`measure`), el estado colapsa de forma verdaderamente impredecible en bits clásicos. Estos bits se agrupan para dar origen a dos enteros aleatorios que utilizaremos como coordenadas espaciales: **X** e **Y**.
+3. Al realizar la medición (`measure`), el estado colapsa de forma verdaderamente impredecible en bits clásicos. Estos bits se agrupan para dar origen a dos enteros aleatorios que se utilizarán como coordenadas espaciales: **X** e **Y**.
 
 #### Etapa B: Captura de Entropía Macroscópica (Pillow + Imagen)
 
@@ -66,9 +66,11 @@ Para transformar este flujo de caos físico y cuántico en un formato compatible
 
 ## Auditoría Visual de la Entropía
 
-Para garantizar de manera auditable que la aleatoriedad generada es criptográficamente robusta antes de ser inyectada en la etapa de hash, el proyecto incluye un frontend de visualización web (`index.html`).
+Para garantizar de manera auditable que la aleatoriedad generada es criptográficamente robusta antes de ser inyectada en la etapa de hash, el proyecto incluye un frontend de visualización web (`index.html`). Este dashboard consume directamente el motor de entropía cruda de la API (`/raw_entropy`) y grafica los resultados dinámicamente en un espacio tridimensional.
 
-Este dashboard consume directamente el motor de entropía cruda de la API (`/raw_entropy`) y grafica los resultados dinámicamente en un espacio tridimensional. Gracias a la etapa de *Entropy Whitening* documentada anteriormente, el gráfico demuestra empíricamente la erradicación total de los sesgos y patrones físicos de la imagen de origen, resultando en una nube de estática tridimensional de distribución uniforme perfecta:
+![Distribución Uniforme de Entropía Híbrida y Blanqueamiento XOR](results.png)
+
+Como se puede apreciar en la imagen, los resultados obtenidos son excelentes. Gracias a la etapa de *Entropy Whitening* (Blanqueamiento XOR), se logra erradicar por completo los sesgos de color y patrones físicos de la imagen de origen (el clásico *Histogram Bias*). En lugar de ver agrupaciones o zonas vacías, el gráfico muestra una nube de estática tridimensional perfecta, ocupando todos los rincones del espacio RGB. Esto demuestra visualmente que se alcanza una distribución uniforme ideal, validando la robustez de la fuente de entropía en tiempo real.
 
 ---
 
