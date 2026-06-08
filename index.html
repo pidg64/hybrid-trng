@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hybrid-TRNG - Dispersión de Entropía Cruda</title>
+    <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+    <style>
+        body { 
+            background-color: #0d1117; 
+            color: #c9d1d9; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; 
+            text-align: center; 
+            margin: 0;
+            padding: 20px;
+        }
+        h2 { color: #58a6ff; margin-bottom: 5px; }
+        p { color: #8b949e; margin-top: 0; font-size: 0.9em; }
+        #plot-container { 
+            width: 90vw; 
+            height: 80vh; 
+            margin: 0 auto; 
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            background-color: #161b22;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Validación de Entropía Híbrida (Física + Cuántica)</h2>
+    <p>Dispersión 3D de píxeles capturados antes del hashing SHA-256. | Ejes: Rojo (X), Verde (Y), Azul (Z)</p>
+    <p>Requests HTTP efectuadas: <span id="request-counter" style="color: #fff; font-weight: bold;">0</span> / 624</p>
+    
+    <div id="plot-container"></div>
+
+    <script>
+        // 1. Configuración Inicial del Gráfico 3D
+        var trace = {
+            x: [], y: [], z: [],
+            mode: 'markers',
+            marker: {
+                size: 6,
+                color: [], // Se llenará dinámicamente con el color RGB real
+                opacity: 0.8,
+                line: { width: 1, color: '#000' }
+            },
+            type: 'scatter3d'
+        };
+
+        var layout = {
+            margin: { l: 0, r: 0, b: 0, t: 0 },
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { color: '#8b949e' },
+            scene: {
+                xaxis: { title: 'Rojo (R)', range: [0, 255], backgroundcolor: '#161b22', gridcolor: '#30363d' },
+                yaxis: { title: 'Verde (G)', range: [0, 255], backgroundcolor: '#161b22', gridcolor: '#30363d' },
+                zaxis: { title: 'Azul (B)', range: [0, 255], backgroundcolor: '#161b22', gridcolor: '#30363d' }
+            }
+        };
+
+        // Renderizamos el gráfico vacío
+        Plotly.newPlot('plot-container', [trace], layout);
+
+        let requestCount = 0;
+        const counterElement = document.getElementById('request-counter');
+
+        // 2. Ciclo de Captura de Entropía
+        // Ejecutamos una petición GET cada 300ms a la API local
+        setInterval(async () => {
+            if (requestCount >= 624) return; // Detenemos en 624 requests
+
+            try {
+                const response = await fetch('http://127.0.0.1:8000/raw_entropy');
+                if (!response.ok) throw new Error('API no responde');
+                
+                const data = await response.json();
+
+                // Incrementa y actualiza el contador
+                requestCount++;
+                counterElement.textContent = requestCount;
+
+                // Construimos el string de color CSS para el punto
+                const colorString = `rgb(${data.r}, ${data.g}, ${data.b})`;
+
+                // Agregamos dinámicamente el nuevo punto al gráfico
+                Plotly.extendTraces('plot-container', {
+                    x: [[data.r]],
+                    y: [[data.g]],
+                    z: [[data.b]],
+                    'marker.color': [[colorString]]
+                }, [0]);
+
+            } catch (error) {
+                console.error('Error recolectando entropía:', error);
+            }
+        }, 300);
+    </script>
+
+</body>
+</html>

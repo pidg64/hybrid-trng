@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+requests
+randcrack
+qiskit
+qiskit-aer
+pillow
