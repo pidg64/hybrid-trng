@@ -74,11 +74,11 @@ Como se puede apreciar en la imagen, los resultados obtenidos son excelentes. Gr
 
 ---
 
-## Consideración Técnica: Modulo Bias
+## Consideración Técnica: Mitigación de Modulo Bias (Rejection Sampling)
 
-Al utilizar la operación matemática de módulo (`%`) para ajustar los números cuánticos generados a los límites físicos del tamaño de la imagen (ej. `x = raw_x % width`), se introduce un levísimo sesgo estadístico conocido como **Modulo Bias**.
+Un problema común al ajustar números aleatorios a un rango específico utilizando la operación matemática de módulo (`%`) es la introducción de un levísimo sesgo estadístico conocido como **Modulo Bias**. Esto ocurre porque el espacio de estados máximo del generador rara vez es un múltiplo exacto del límite deseado, otorgando mayor probabilidad de selección a los valores inferiores de la imagen.
 
-Dado que el número máximo posible generado por el circuito cuántico rara vez resulta ser un múltiplo exacto del ancho de la resolución de la imagen, los primeros píxeles de la imagen poseen una probabilidad minúsculamente mayor de ser seleccionados. Para los objetivos de esta Prueba de Concepto, este efecto es despreciable y es mitigado por la Fusión Criptográfica posterior. En un entorno de producción con requerimientos estrictos, esta situación se corregiría aplicando un algoritmo de *Rejection Sampling* (Descarte) sobre el output espacial del hardware cuántico.
+Para evitar esto y garantizar una entropía criptográficamente perfecta con una distribución estrictamente uniforme (0% de sesgo) en las coordenadas espaciales **X** e **Y**, el motor central implementa de forma nativa **Rejection Sampling (Muestreo por Descarte)**. En lugar de forzar numéricamente el píxel a encajar deformando la probabilidad estadística, se extrae la cantidad exacta de qubits (`bit_length()`) para la resolución visual en juego y, si la medición clásica llega a asomar por fuera de los límites de la imagen, simplemente se rechaza la tirada y el simulador cuántico efectúa una medición completamente nueva. Esto elimina la principal deficiencia de la entropía proyectada manteniendo la pureza de los datos.
 
 ---
 
