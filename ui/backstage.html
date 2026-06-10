@@ -89,8 +89,8 @@
   </section>
 
   <section class="card">
-    <div class="step">2 · Crop</div><h2>✂️ Frame → crop</h2>
-    <p class="sub">We take a square region of the frame (the "little part") and split it into a 30×30 grid = 900 cells.</p>
+    <div class="step">2 · Random window</div><h2>✂️ Frame → small random window</h2>
+    <p class="sub">We grab a small <b>random</b> 30×30-pixel window of the frame and lay a 30×30 grid on it — each cell is one real pixel (900 total).</p>
     <div class="box"><canvas id="cFrame" width="560" height="560"></canvas><div class="ph" id="cFrame-ph">Tap “Analyze live”.</div></div>
   </section>
 
@@ -158,7 +158,7 @@
       xF.strokeStyle="rgba(169,136,255,.95)"; xF.lineWidth=3;
       xF.strokeRect(cb.x*sx,cb.y*sy,cb.w*sx,cb.h*sy);
       xF.fillStyle="rgba(169,136,255,.9)"; xF.font="bold 13px sans-serif";
-      xF.fillText("crop "+cb.w+"×"+cb.h, cb.x*sx+6, cb.y*sy+18);
+      xF.fillText("random window "+cb.w+"×"+cb.h+" px", 8, 18);
     }; im.src="data:image/jpeg;base64,"+data.frame;
     document.getElementById("cFrame-ph").style.display="none";
   }

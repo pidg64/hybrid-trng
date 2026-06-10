@@ -212,6 +212,10 @@ class VideoStream(FrameProvider):
         if fid != self._cached_id:
             rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             img = Image.fromarray(rgb)
+            # Mismo cap que _get_image: dims < 16384 (2^14) -> coords ≤ 14 qubits.
+            # (Para cámaras reales nunca dispara; mantiene el invariante en vivo.)
+            if img.width >= 16384 or img.height >= 16384:
+                img.thumbnail((16383, 16383))
             self._cached_frame = (img, img.width, img.height, img.load())
             self._cached_id = fid
         return self._cached_frame

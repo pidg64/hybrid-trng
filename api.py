@@ -281,17 +281,19 @@ def demo_attack(target: str = "vulnerable"):
 # ============================================================================
 #  PANTALLA DE FONDO  —  selección cuántica por grilla (fiel a seleccion_qiskit.py)
 # ============================================================================
-#  Sobre el frame actual: recorto una región, la divido en una grilla GRID×GRID,
-#  y qiskit (Hadamard sobre QUBITS qubits) elige N_SELECT índices con Rejection
-#  Sampling sin reposición. Para cada celda elegida muestro el pixel crudo, la
-#  máscara cuántica y el XOR (whitening). NOTA: esto es solo la visualización
-#  didáctica; el motor de tokens (capture_entropy) no cambia.
+#  Sobre el frame actual: tomo una VENTANA CHICA Y ALEATORIA de GRID×GRID píxeles
+#  (así cada celda de la grilla = 1 píxel real), y qiskit (Hadamard sobre QUBITS
+#  qubits) elige N_SELECT índices con Rejection Sampling sin reposición. Para cada
+#  celda elegida muestro el pixel crudo, la máscara cuántica y el XOR (whitening).
+#  NOTA: esto es solo la visualización didáctica; el motor de tokens no cambia.
 
-GRID = 30                 # 30x30 = 900 celdas
+GRID = 30                 # 30x30 = 900 celdas; cada celda = 1 píxel real de la ventana
 N_SELECT = 32             # cuántas celdas elige qiskit
 QUBITS = 10               # 2^10 = 1024 >= 900
 MAX_INDEX = GRID * GRID   # 900
 MAX_ROLLS = 400           # tope de tiradas (incluye rechazos) para no colgarse
+_viz_rng = random.Random()  # RNG propio para sortear la posición de la ventana
+                            # (NO toca el random global que usa el ataque)
 
 
 def _b64_jpeg(im, quality=82):
@@ -303,10 +305,13 @@ def _b64_jpeg(im, quality=82):
 def _grid_select(provider):
     img, w, h, px = provider.get_frame()
 
-    # Crop cuadrado centrado (la "partecita" del frame).
-    side = min(w, h)
-    cx0, cy0 = (w - side) // 2, (h - side) // 2
-    cell = side / GRID
+    # Ventana CHICA y ALEATORIA del frame (la "partecita"): GRID×GRID píxeles,
+    # así cada celda de la grilla mapea a 1 píxel real. La posición se sortea con
+    # un RNG propio (no el global) para no interferir con el ataque.
+    win = min(GRID, w, h)
+    cx0 = _viz_rng.randint(0, max(0, w - win))
+    cy0 = _viz_rng.randint(0, max(0, h - win))
+    cell = win / GRID
 
     rolls, selected, seen = [], [], set()
     n_rolls = 0
@@ -338,14 +343,14 @@ def _grid_select(provider):
         })
 
     disp = img.copy(); disp.thumbnail((560, 560))
-    crop = img.crop((cx0, cy0, cx0 + side, cy0 + side)).resize((420, 420), Image.NEAREST)
+    crop = img.crop((cx0, cy0, cx0 + win, cy0 + win)).resize((420, 420), Image.NEAREST)
 
     return {
         "connected": bool(getattr(provider, "connected", True)),
         "frame": _b64_jpeg(disp),
         "orig_width": w, "orig_height": h,
         "disp_width": disp.width, "disp_height": disp.height,
-        "crop_box": {"x": cx0, "y": cy0, "w": side, "h": side},
+        "crop_box": {"x": cx0, "y": cy0, "w": win, "h": win},
         "crop": _b64_jpeg(crop),
         "grid": GRID, "n_select": N_SELECT, "qubits": QUBITS, "max_index": MAX_INDEX,
         "rolls": rolls,
