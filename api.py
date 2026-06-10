@@ -1,21 +1,21 @@
 import random
 import sqlite3
-import hashlib
 import uvicorn
 
-from PIL import Image
 from pydantic import BaseModel
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-# Importaciones Cuánticas
-from qiskit_aer import AerSimulator
-from qiskit import QuantumCircuit, transpile
-
-# Simulador global para evitar instanciación constante por request
-simulator = AerSimulator()
+# Motor de entropía refactorizado (defense in depth: físico + urandom).
+# capture_hybrid_entropy alimenta el dashboard de auditoría visual;
+# HybridSource alimenta la generación de tokens (físico secundario + urandom).
+from trng.physical import capture_hybrid_entropy
+from trng.sources import HybridSource
 
 app = FastAPI(title="Hybrid-TRNG API")
+
+# Fuente combinada global: mezcla físico + urandom con BLAKE2b y expande vía DRBG.
+secure_source = HybridSource()
 
 # --- CONFIGURACIÓN CORS ---
 app.add_middleware(
@@ -64,62 +64,14 @@ class LoginRequest(BaseModel):
     password: str
 
 
-def get_quantum_random_int(num_bits=12):
-    qc = QuantumCircuit(num_bits, num_bits)
-    qc.h(range(num_bits))
-    qc.measure(range(num_bits), range(num_bits))
-    
-    compiled_circuit = transpile(qc, simulator)
-    job = simulator.run(compiled_circuit, shots=1, memory=True)
-    
-    binary_string = job.result().get_memory()[0]
-    return int(binary_string, 2)
-
-
-def capture_hybrid_entropy(image_path="frame.png"):
-    try:
-        img = Image.open(image_path).convert("RGB")
-    except FileNotFoundError:
-        img = Image.new('RGB', (800, 600), color='black')
-    # Limitamos dimensiones para no exceder 14 qubits (width/height < 16384)
-    # thumbnail() muta la imagen manteniendo automáticamente la relación de aspecto. 
-    if img.width >= 16384 or img.height >= 16384:
-        img.thumbnail((16383, 16383))
-    width, height = img.size
-    # 1. Entropía para Coordenadas (Rejection Sampling)
-    # Calculamos la cantidad mínima de bits necesarios para la dimensión actual
-    # Esto minimiza drásticamente la cantidad de descartes y optimiza el simulador.
-    bits_x = width.bit_length()
-    while True:
-        x = get_quantum_random_int(num_bits=bits_x)
-        if x < width:
-            break            
-    bits_y = height.bit_length()
-    while True:
-        y = get_quantum_random_int(num_bits=bits_y)
-        if y < height:
-            break            
-    pixel_color = img.getpixel((x, y))
-    # 2. Entropía para Blanqueamiento
-    # Dividimos la máscara en 3 mediciones de 8 qubits para garantizar
-    # que ninguna simulación cuántica individual exceda los 16 qubits máximos permitidos.
-    mask_r = get_quantum_random_int(num_bits=8)
-    mask_g = get_quantum_random_int(num_bits=8)
-    mask_b = get_quantum_random_int(num_bits=8)
-    # 3. Blanqueamiento XOR
-    r = pixel_color[0] ^ mask_r
-    g = pixel_color[1] ^ mask_g
-    b = pixel_color[2] ^ mask_b    
-    return x, y, r, g, b
-
-
 def generate_secure_token():
-    # Consumimos la función base
-    x, y, r, g, b = capture_hybrid_entropy()
-    raw_data = f"X:{x}-Y:{y}-R:{r}-G:{g}-B:{b}"
-    secure_seed_hex = hashlib.sha256(raw_data.encode('utf-8')).hexdigest()
-    secure_token_int = int(secure_seed_hex, 16)
-    print(f"Entropía capturada -> Coordenadas: ({x}, {y}) | RGB blanqueado: ({r}, {g}, {b})")
+    # Defense in depth: el token sale del pipeline híbrido
+    # seed = BLAKE2b(fisico || urandom) -> CSPRNG (modo contador).
+    # Si la física falla o está congelada, urandom sostiene la garantía
+    # criptográfica (Leftover Hash Lemma); nunca hay degradación catastrófica.
+    token_bytes = secure_source.get_bytes(32)  # 256 bits
+    secure_token_int = int.from_bytes(token_bytes, "big")
+    print(f"Token seguro generado (fuente: {secure_source.health().value})")
     return str(secure_token_int)
 
 

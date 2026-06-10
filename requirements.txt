@@ -5,3 +5,7 @@ randcrack
 qiskit
 qiskit-aer
 pillow
+numpy
+nistrng
+matplotlib
+scipy
