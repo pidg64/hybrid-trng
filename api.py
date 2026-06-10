@@ -166,6 +166,12 @@ def page_backstage():
     return FileResponse(os.path.join(BASE_DIR, "backstage.html"))
 
 
+@app.get("/brainrot")
+def page_brainrot():
+    """Easter egg: LavaRand Casino 🎰 (memes + tragamonedas con entropía real)."""
+    return FileResponse(os.path.join(BASE_DIR, "brainrot.html"))
+
+
 @app.get("/feed_url")
 def feed_url():
     """URL del live feed para que el navegador muestre la cámara.
