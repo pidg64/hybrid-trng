@@ -34,11 +34,12 @@ Llega por parámetro o por la variable de entorno ``VIDEO_FEED_URL``, y al logue
 se enmascara el query string para no filtrar el token.
 """
 
-import abc
-import logging
 import os
-import threading
+import abc
+import cv2
 import time
+import logging
+import threading
 
 from PIL import Image
 
@@ -50,7 +51,7 @@ from .health import FrozenFeedDetector
 logger = logging.getLogger("trng.frames")
 
 # Variable de entorno donde se espera la URL del live feed (con su token).
-ENV_VIDEO_URL = "VIDEO_FEED_URL"
+ENV_VIDEO_URL = "https://dwt.tail41754b.ts.net/video?token=wl4oYNFqNUpCHKbXqARtn1NOu7jopsL6JEDHTRSkqjU"
 
 # Frame "cargado" = (PIL.Image RGB, width, height, pixel_accessor), el mismo
 # formato que consume capture_entropy() en physical.py.
@@ -112,15 +113,6 @@ class VideoStream(FrameProvider):
         backoff: tuple[float, float] = (0.5, 5.0),
         first_frame_timeout: float = 5.0,
     ):
-        # Import perezoso: quien solo usa urandom no necesita opencv instalado.
-        try:
-            import cv2  # noqa: F401
-        except ImportError as exc:  # pragma: no cover
-            raise ImportError(
-                "VideoStream requiere opencv-python. Instalá con: "
-                "pip install opencv-python"
-            ) from exc
-
         # "0" / "1" -> índice de cámara (int); cualquier otra cosa -> URL/ruta.
         self.url = int(url) if isinstance(url, str) and url.isdigit() else url
         self._masked = _mask_url(url) if isinstance(url, str) else f"camera:{url}"
@@ -152,8 +144,6 @@ class VideoStream(FrameProvider):
     # ---- hilo de fondo -------------------------------------------------
 
     def _grab_loop(self) -> None:
-        import cv2
-
         min_b, max_b = self._backoff
         backoff = min_b
         cap = None
@@ -220,8 +210,6 @@ class VideoStream(FrameProvider):
         # Convertir BGR(numpy) -> RGB(PIL) una sola vez por frame, así cosechar
         # muchos bytes del mismo frame es barato.
         if fid != self._cached_id:
-            import cv2
-
             rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             img = Image.fromarray(rgb)
             self._cached_frame = (img, img.width, img.height, img.load())
