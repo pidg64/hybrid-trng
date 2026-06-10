@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -76,13 +76,13 @@
 <canvas class="sparkles" id="sparkles"></canvas>
 
 <nav class="topnav">
-  <a href="index.html">🏠 Inicio</a>
-  <a href="backstage.html">① Cómo funciona</a>
-  <a href="demo.html">② Demo de ataque</a>
+  <a href="index.html">🏠 Home</a>
+  <a href="backstage.html">① How it works</a>
+  <a href="demo.html">② Attack demo</a>
 </nav>
 
 <h1>🎰 QUANTUM AI ENTROPY FOR REAL REAL CASINO 🎰</h1>
-<p class="tagline">la única tragamonedas con entropía CUÁNTICA fr fr 🌋 no cap</p>
+<p class="tagline">the only slot machine with QUANTUM entropy fr fr 🌋 no cap</p>
 <div class="aura" id="aura">AURA: 0 ✨</div>
 
 <div class="machine">
@@ -97,12 +97,12 @@
   </div>
 </div>
 
-<div class="result" id="result">tirá la palanca, rey 👑</div>
+<div class="result" id="result">pull the lever, king 👑</div>
 
 <div class="footer">
-  💀 <b>dato cripto-pilled:</b> con <span class="red">random.getrandbits()</span> la casa SIEMPRE sabe tu próxima tirada (MT19937 clonable, ver <a class="back" href="demo.html">la demo</a>).
-  Acá giramos con <span class="grn">MAELSTROM</span> = BLAKE2b(cámara‖cuántico‖urandom) → ni la casa puede predecir. <br>
-  (igual perdés plata, es un casino 🤡) — <a class="back" href="demo.html">← volver a la demo seria</a>
+  💀 <b>crypto-pilled fact:</b> with <span class="red">random.getrandbits()</span> the house ALWAYS knows your next spin (MT19937 is clonable, see <a class="back" href="demo.html">the demo</a>).
+  Here we spin with <span class="grn">MAELSTROM</span> = BLAKE2b(camera‖quantum‖urandom) → not even the house can predict it. <br>
+  (you still lose money, it's a casino 🤡) — <a class="back" href="demo.html">← back to the serious demo</a>
 </div>
 
 <div class="mega" id="mega"><div id="megatxt">MEGA WIN</div></div>
@@ -149,7 +149,7 @@
     if(spinning) return; spinning=true;
     document.getElementById("spin").disabled=true;
     document.getElementById("spinReal").disabled=true;
-    resEl.textContent = useReal ? "consultando el cosmos cuántico… 🌌" : "girando… 🎲";
+    resEl.textContent = useReal ? "consulting the quantum cosmos… 🌌" : "spinning… 🎲";
     reels.forEach(r=>r.classList.add("spin"));
     const cyc = reels.map(r=>setInterval(()=>{ r.textContent=SYMBOLS[rnd(SYMBOLS.length)]; }, 70));
 
@@ -168,7 +168,7 @@
       resEl.innerHTML = "🎉 "+m+" (+"+gain+" aura) 🎉";
       megaWin(m); for(let k=0;k<24;k++) setTimeout(()=>pop(["🎉","💰","✨","🤑","🌋","💎"][rnd(6)]),k*45);
     } else if(twoOfKind){
-      setAura(aura+50); resEl.textContent="casi… 😤 +50 aura (cope)"; pop("+50 aura","#aaff00");
+      setAura(aura+50); resEl.textContent="so close… 😤 +50 aura (cope)"; pop("+50 aura","#aaff00");
     } else {
       setAura(Math.max(0,aura-30)); resEl.textContent=LOSES[rnd(LOSES.length)];
       pop(BRAINROT[rnd(BRAINROT.length)],"#ff2e88");

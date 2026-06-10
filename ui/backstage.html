@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>MAELSTROM · Cómo funciona</title>
+<title>MAELSTROM · How it works</title>
 <style>
   :root{--bg:#0b0e14;--panel:#11161f;--panel2:#0d121a;--border:#222b3a;--txt:#c9d4e3;
     --muted:#7d8aa0;--accent:#58a6ff;--cyan:#39d4d4;--red:#ff5c5c;--green:#3fb950;--purple:#a988ff}
@@ -63,55 +63,55 @@
 </head>
 <body>
 <header>
-  <div class="brand"><div class="logo">🌀</div><div>MAELSTROM <small>cómo funciona · qué pixeles elige qiskit</small></div></div>
+  <div class="brand"><div class="logo">🌀</div><div>MAELSTROM <small>how it works · which pixels qiskit picks</small></div></div>
   <nav class="steps">
-    <a href="index.html">Inicio</a>
-    <a href="backstage.html" class="active">① Cómo funciona</a>
-    <a href="demo.html">② Demo de ataque</a>
+    <a href="index.html">Home</a>
+    <a href="backstage.html" class="active">① How it works</a>
+    <a href="demo.html">② Attack demo</a>
     <a href="brainrot.html" class="egg">🎰</a>
   </nav>
 </header>
 
 <div class="toolbar">
-  <button class="go" id="toggle" onclick="toggleLive()">▶ Analizar en vivo</button>
-  <span class="pill"><span class="dot" id="conn"></span><span id="conn-txt">en pausa</span></span>
-  <span class="pill">fuente: <b id="health">—</b></span>
-  <span class="pill">grilla: <b id="gridinfo">30×30 (900)</b></span>
+  <button class="go" id="toggle" onclick="toggleLive()">▶ Analyze live</button>
+  <span class="pill"><span class="dot" id="conn"></span><span id="conn-txt">paused</span></span>
+  <span class="pill">source: <b id="health">—</b></span>
+  <span class="pill">grid: <b id="gridinfo">30×30 (900)</b></span>
   <span class="pill">qiskit: <b id="qinfo">Hadamard · 10 qubits</b></span>
-  <span class="pill">elegidos: <b id="ninfo">32</b></span>
+  <span class="pill">selected: <b id="ninfo">32</b></span>
 </div>
 
 <main>
   <section class="card">
-    <div class="step">1 · Entrada</div><h2>📷 Live feed (cámara)</h2>
-    <p class="sub">El frame lo elegimos nosotros (la cámara). qiskit NO elige el frame — elige píxeles dentro de él.</p>
-    <div class="box"><img id="feed" alt="feed" style="display:none"/><div class="ph" id="feed-ph">Cargando live feed…</div></div>
+    <div class="step">1 · Input</div><h2>📷 Live feed (camera)</h2>
+    <p class="sub">We choose the frame (the camera). qiskit does NOT pick the frame — it picks pixels within it.</p>
+    <div class="box"><img id="feed" alt="feed" style="display:none"/><div class="ph" id="feed-ph">Loading live feed…</div></div>
   </section>
 
   <section class="card">
-    <div class="step">2 · Recorte</div><h2>✂️ Frame → crop</h2>
-    <p class="sub">Tomamos una región cuadrada del frame (la "partecita") y la dividimos en una grilla 30×30 = 900 celdas.</p>
-    <div class="box"><canvas id="cFrame" width="560" height="560"></canvas><div class="ph" id="cFrame-ph">Tocá “Analizar en vivo”.</div></div>
+    <div class="step">2 · Crop</div><h2>✂️ Frame → crop</h2>
+    <p class="sub">We take a square region of the frame (the "little part") and split it into a 30×30 grid = 900 cells.</p>
+    <div class="box"><canvas id="cFrame" width="560" height="560"></canvas><div class="ph" id="cFrame-ph">Tap “Analyze live”.</div></div>
   </section>
 
   <section class="card">
-    <div class="step">3 · Selección cuántica</div><h2>🎯 32 celdas que eligió qiskit</h2>
-    <p class="sub">Hadamard sobre 10 qubits → índice 0–1023. Rejection sampling: si cae ≥900 o repetido, se descarta y se vuelve a tirar.</p>
-    <div class="box"><canvas id="cGrid" width="420" height="420"></canvas><div class="ph" id="cGrid-ph">esperando…</div></div>
+    <div class="step">3 · Quantum selection</div><h2>🎯 32 cells qiskit picked</h2>
+    <p class="sub">Hadamard on 10 qubits → index 0–1023. Rejection sampling: if it lands ≥900 or repeats, discard and re-roll.</p>
+    <div class="box"><canvas id="cGrid" width="420" height="420"></canvas><div class="ph" id="cGrid-ph">waiting…</div></div>
   </section>
 
   <section class="card wide">
     <div class="two">
       <div>
-        <div class="step">tiradas de qiskit (rejection sampling)</div>
-        <h2>🎰 Mediciones cuánticas</h2>
-        <p class="sub">Cada tirada son los 10 bits medidos → índice. En verde las aceptadas, atenuadas las descartadas.</p>
+        <div class="step">qiskit rolls (rejection sampling)</div>
+        <h2>🎰 Quantum measurements</h2>
+        <p class="sub">Each roll is the 10 measured bits → index. Accepted ones in green, discarded ones dimmed.</p>
         <div class="rolls" id="rolls"><div class="ph">—</div></div>
       </div>
       <div>
-        <div class="step">whitening (el shift + XOR de abajo)</div>
-        <h2>⊕ Pixel crudo XOR máscara cuántica</h2>
-        <p class="sub">Cada pixel elegido se blanquea: <code>byte_crudo ⊕ máscara_cuántica = ruido blanco</code> (anti-sesgo).</p>
+        <div class="step">whitening (the shift + XOR below)</div>
+        <h2>⊕ Raw pixel XOR quantum mask</h2>
+        <p class="sub">Each chosen pixel is whitened: <code>raw_byte ⊕ quantum_mask = white noise</code> (anti-bias).</p>
         <div class="xor" id="xor"><div class="ph">—</div></div>
       </div>
     </div>
@@ -121,15 +121,15 @@
 <div class="pipe">
   <div class="flow">
     <span class="tag">📷 frame</span><span class="o">→ crop →</span>
-    <span class="tag">grilla 30×30</span><span class="o">→ Hadamard(10q) →</span>
-    <span class="tag">32 índices</span><span class="o">→ pixel ⊕ máscara →</span>
-    <span class="tag">ruido blanco</span><span class="o">→</span><b>BLAKE2b(físico‖urandom)</b><span class="o">→</span><b>token 256 bits</b>
+    <span class="tag">30×30 grid</span><span class="o">→ Hadamard(10q) →</span>
+    <span class="tag">32 indices</span><span class="o">→ pixel ⊕ mask →</span>
+    <span class="tag">white noise</span><span class="o">→</span><b>BLAKE2b(physical‖urandom)</b><span class="o">→</span><b>256-bit token</b>
   </div>
 </div>
 
 <div class="footnav">
-  <a href="index.html">← Inicio</a>
-  <a class="next" href="demo.html">② Ahora atacá el sistema →</a>
+  <a href="index.html">← Home</a>
+  <a class="next" href="demo.html">② Now attack the system →</a>
 </div>
 
 <script>
@@ -141,11 +141,11 @@
   (async function loadFeed(){
     const img=document.getElementById("feed"), ph=document.getElementById("feed-ph");
     try{ const {url}=await (await fetch(`${API}/feed_url`)).json();
-      if(!url){ph.textContent="No hay VIDEO_FEED_URL.";return;}
+      if(!url){ph.textContent="No VIDEO_FEED_URL set.";return;}
       img.onload=()=>{img.style.display="block";ph.style.display="none";};
-      img.onerror=()=>{ph.textContent="El navegador no pudo abrir el stream (formato/red).";};
+      img.onerror=()=>{ph.textContent="The browser couldn't open the stream (format/network).";};
       img.src=url;
-    }catch(e){ph.textContent="API offline en "+API;}
+    }catch(e){ph.textContent="API offline at "+API;}
   })();
 
   function setConn(s,txt){const d=document.getElementById("conn");d.className="dot "+(s===null?"":(s?"on":"off"));document.getElementById("conn-txt").textContent=txt;}
@@ -185,8 +185,9 @@
     const box=document.getElementById("rolls"); box.innerHTML="";
     data.rolls.forEach(r=>{ const d=document.createElement("div");
       d.className="roll "+(r.ok?"ok":"bad");
+      const reason = r.reason || "accepted";
       d.innerHTML=`<span class="b">${r.bits}</span><span class="i">→ ${r.index}</span>
-        <span class="tick">${r.ok?"✓":"✗"}</span><span class="why">${r.reason||"aceptado"}</span>`;
+        <span class="tick">${r.ok?"✓":"✗"}</span><span class="why">${reason}</span>`;
       box.appendChild(d); });
   }
 
@@ -203,8 +204,8 @@
   async function tick(){
     try{ const data=await (await fetch(`${API}/demo/quantum_select`)).json();
       document.getElementById("health").textContent=data.health||"—";
-      if(data.connected===false){ setConn(false, data.error?"feed no disponible":"desconectado"); return; }
-      setConn(true,"EN VIVO");
+      if(data.connected===false){ setConn(false, data.error?"feed unavailable":"disconnected"); return; }
+      setConn(true,"LIVE");
       document.getElementById("gridinfo").textContent=`${data.grid}×${data.grid} (${data.max_index})`;
       document.getElementById("qinfo").textContent=`Hadamard · ${data.qubits} qubits`;
       document.getElementById("ninfo").textContent=data.n_select;
@@ -213,8 +214,8 @@
   }
 
   function toggleLive(){ live=!live; const b=document.getElementById("toggle");
-    if(live){ b.textContent="⏸ Pausar"; b.classList.add("live"); setConn(null,"analizando…"); tick(); timer=setInterval(tick,3500); }
-    else{ b.textContent="▶ Analizar en vivo"; b.classList.remove("live"); setConn(null,"en pausa"); clearInterval(timer); } }
+    if(live){ b.textContent="⏸ Pause"; b.classList.add("live"); setConn(null,"analyzing…"); tick(); timer=setInterval(tick,3500); }
+    else{ b.textContent="▶ Analyze live"; b.classList.remove("live"); setConn(null,"paused"); clearInterval(timer); } }
 </script>
 </body>
 </html>

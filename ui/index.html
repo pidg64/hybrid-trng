@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>MAELSTROM · Entropía híbrida cuántica</title>
+<title>MAELSTROM · Hybrid quantum entropy</title>
 <style>
   :root{--bg:#0b0e14;--panel:#11161f;--panel2:#0d121a;--border:#222b3a;--txt:#c9d4e3;
     --muted:#7d8aa0;--accent:#58a6ff;--cyan:#39d4d4;--red:#ff5c5c;--green:#3fb950;--purple:#a988ff}
@@ -51,45 +51,45 @@
 </head>
 <body>
 <header>
-  <div class="brand"><div class="logo">🌀</div><div>MAELSTROM <small>entropía híbrida: cámara + cuántico + urandom</small></div></div>
+  <div class="brand"><div class="logo">🌀</div><div>MAELSTROM <small>hybrid entropy: camera + quantum + urandom</small></div></div>
   <nav class="steps">
-    <a href="index.html" class="active">Inicio</a>
-    <a href="backstage.html">① Cómo funciona</a>
-    <a href="demo.html">② Demo de ataque</a>
+    <a href="index.html" class="active">Home</a>
+    <a href="backstage.html">① How it works</a>
+    <a href="demo.html">② Attack demo</a>
     <a href="brainrot.html" class="egg">🎰</a>
   </nav>
 </header>
 
 <section class="hero">
   <h1>MAELSTROM</h1>
-  <p class="tag">aleatoriedad imposible de predecir, del caos del mundo real</p>
+  <p class="tag">unpredictable randomness, born from real-world chaos</p>
   <p class="desc">
-    La mayoría de los sistemas generan tokens con PRNGs <b>predecibles</b> (como el Mersenne Twister).
-    MAELSTROM mezcla <b>caos físico</b> (un live feed de cámara), <b>aleatoriedad cuántica</b> (qiskit) y el
-    <b>CSPRNG del sistema</b> con <code>BLAKE2b</code> — y por el <i>Leftover Hash Lemma</i>, el resultado es
-    tan fuerte como la mejor de sus fuentes. Recorré la demo 👇
+    Most systems generate tokens with <b>predictable</b> PRNGs (like the Mersenne Twister).
+    MAELSTROM blends <b>physical chaos</b> (a live camera feed), <b>quantum randomness</b> (qiskit) and the
+    system <b>CSPRNG</b> with <code>BLAKE2b</code> — and by the <i>Leftover Hash Lemma</i>, the result is
+    as strong as its strongest source. Take the tour 👇
   </p>
   <div class="ctas">
-    <a class="cta" href="backstage.html">Empezar el recorrido →</a>
-    <a class="cta ghost" href="demo.html">Ir directo al ataque 🎯</a>
+    <a class="cta" href="backstage.html">Start the tour →</a>
+    <a class="cta ghost" href="demo.html">Jump to the attack 🎯</a>
   </div>
 </section>
 
 <section class="cards">
   <div class="card">
-    <div class="ic">🎲</div><div class="num">EL PROBLEMA</div>
-    <h3>RNGs predecibles</h3>
-    <p>Con <code>random.getrandbits()</code> un atacante puede clonar el generador y predecir tu próximo token de reseteo. Account takeover en minutos.</p>
+    <div class="ic">🎲</div><div class="num">THE PROBLEM</div>
+    <h3>Predictable RNGs</h3>
+    <p>With <code>random.getrandbits()</code> an attacker can clone the generator and predict your next reset token. Account takeover in minutes.</p>
   </div>
   <div class="card">
-    <div class="ic">🌀</div><div class="num">LA SOLUCIÓN</div>
-    <h3>Entropía híbrida</h3>
-    <p>Píxeles elegidos por mediciones cuánticas (Hadamard) sobre un live feed, blanqueados con XOR y mezclados con urandom vía BLAKE2b.</p>
+    <div class="ic">🌀</div><div class="num">THE SOLUTION</div>
+    <h3>Hybrid entropy</h3>
+    <p>Pixels chosen by quantum measurements (Hadamard) over a live feed, whitened with XOR and mixed with urandom via BLAKE2b.</p>
   </div>
   <div class="card">
-    <div class="ic">🔬</div><div class="num">LA PRUEBA</div>
-    <h3>Atacá ambos en vivo</h3>
-    <p>El mismo ataque contra el endpoint vulnerable (<b>PWNED</b>) y contra MAELSTROM (<b>MITIGADO</b>), con logs en tiempo real.</p>
+    <div class="ic">🔬</div><div class="num">THE PROOF</div>
+    <h3>Attack both, live</h3>
+    <p>The same attack against the vulnerable endpoint (<b>PWNED</b>) and against MAELSTROM (<b>MITIGATED</b>), with real-time logs.</p>
   </div>
 </section>
 </body>

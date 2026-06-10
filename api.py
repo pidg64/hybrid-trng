@@ -97,12 +97,12 @@ def request_reset(username: str):
     cursor = db.cursor()
     cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
     if not cursor.fetchone():
-        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+        raise HTTPException(status_code=404, detail="User not found")
     token_int = random.getrandbits(256)
     token = str(token_int)
     cursor.execute("UPDATE users SET reset_token = ? WHERE username = ?", (token, username))
     db.commit()
-    return {"message": f"Token enviado al email de {username}", "token": token}
+    return {"message": f"Token sent to {username}'s email", "token": token}
 
 # 2. ENDPOINT SEGURO
 @app.post("/secure_request_reset/{username}")
@@ -110,11 +110,11 @@ def secure_request_reset(username: str):
     cursor = db.cursor()
     cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
     if not cursor.fetchone():
-        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+        raise HTTPException(status_code=404, detail="User not found")
     token = generate_secure_token()
     cursor.execute("UPDATE users SET reset_token = ? WHERE username = ?", (token, username))
     db.commit()
-    return {"message": f"Token seguro enviado al email de {username}", "token": token}
+    return {"message": f"Secure token sent to {username}'s email", "token": token}
 
 # 3. ENDPOINT PARA DASHBOARD DE ENTROPÍA CRUDA
 @app.get("/raw_entropy")
@@ -129,18 +129,18 @@ def change_password(data: ChangePasswordRequest):
     cursor.execute("SELECT reset_token FROM users WHERE username = ?", (data.username,))
     row = cursor.fetchone()
     if not row or row['reset_token'] is None or row['reset_token'] != data.token:
-        raise HTTPException(status_code=403, detail="Token inválido o expirado")
+        raise HTTPException(status_code=403, detail="Invalid or expired token")
     cursor.execute("UPDATE users SET password = ?, reset_token = NULL WHERE username = ?", (data.new_password, data.username))
     db.commit()
-    return {"message": "Contraseña actualizada exitosamente"}
+    return {"message": "Password updated successfully"}
 
 @app.post("/login")
 def login(data: LoginRequest):
     cursor = db.cursor()
     cursor.execute("SELECT * FROM users WHERE username = ? AND password = ?", (data.username, data.password))
     if cursor.fetchone():
-        return {"message": f"Login exitoso. Bienvenido {data.username}!"}
-    raise HTTPException(status_code=401, detail="Credenciales incorrectas")
+        return {"message": f"Login successful. Welcome {data.username}!"}
+    raise HTTPException(status_code=401, detail="Invalid credentials")
 
 
 # ============================================================================
@@ -186,26 +186,26 @@ def _token_chunks(token_256: int):
 
 
 def _attack_events(target: str):
-    """Ataque en vivo (NDJSON). Self-contained: opera directo sobre el RNG y la 'db'.
+    """Live attack (NDJSON). Self-contained: operates directly on the RNG and the 'db'.
     target='vulnerable' -> random.getrandbits (Mersenne Twister) -> PWNED.
-    target='secure'     -> HybridSource (MAELSTROM)              -> MITIGADO.
+    target='secure'     -> HybridSource (MAELSTROM)              -> MITIGATED.
     """
     secure = (target == "secure")
 
     def ev(level, msg, **extra):
         return json.dumps({"level": level, "msg": msg, **extra}) + "\n"
 
-    label = ("SEGURO — MAELSTROM: cámara + cuántico + urandom (BLAKE2b)"
+    label = ("SECURE — MAELSTROM: camera + quantum + urandom (BLAKE2b)"
              if secure else
              "VULNERABLE — random.getrandbits() → Mersenne Twister")
 
     _reset_demo_state()
-    yield ev("title", f"OBJETIVO: endpoint {label}")
-    yield ev("info", "Estado reseteado: admin / SuperSecret123.")
+    yield ev("title", f"TARGET: {label} endpoint")
+    yield ev("info", "State reset: admin / SuperSecret123.")
     time.sleep(0.25)
 
-    yield ev("phase", "FASE 1 · Recolección — el atacante pide 78 tokens de reseteo (son públicos).")
-    yield ev("dim", "   78 tokens × 8 bloques de 32 bits = 624 enteros (lo que RandCrack necesita).")
+    yield ev("phase", "PHASE 1 · Collection — the attacker requests 78 reset tokens (they're public).")
+    yield ev("dim", "   78 tokens × 8 blocks of 32 bits = 624 integers (what RandCrack needs).")
     rc = RandCrack()
     ingest_failed = False
     for i in range(78):
@@ -214,41 +214,41 @@ def _attack_events(target: str):
             try:
                 rc.submit(chunk)
             except ValueError as e:
-                yield ev("warn", f"   RandCrack rechazó un valor: {e}")
+                yield ev("warn", f"   RandCrack rejected a value: {e}")
                 ingest_failed = True
                 break
         if ingest_failed:
             break
         if (i + 1) % 13 == 0 or (i + 1) == 78:
-            yield ev("info", f"   recolectados {i + 1}/78 tokens…")
+            yield ev("info", f"   collected {i + 1}/78 tokens…")
 
     if ingest_failed:
-        yield ev("good", "🛡️  MITIGADO: la salida ni siquiera tiene la forma esperada por el predictor.")
-        yield ev("done", "Ataque fallido.", success=False, target=target)
+        yield ev("good", "🛡️  MITIGATED: the output doesn't even have the shape the predictor expects.")
+        yield ev("done", "Attack failed.", success=False, target=target)
         return
 
     time.sleep(0.3)
-    yield ev("phase", "FASE 2 · Análisis — alimentando RandCrack (clonador del Mersenne Twister).")
+    yield ev("phase", "PHASE 2 · Analysis — feeding RandCrack (the Mersenne Twister cloner).")
     time.sleep(0.4)
     if secure:
-        yield ev("info", "   RandCrack ingirió los 624 valores, pero el estado del MT no sincroniza con ruido real.")
+        yield ev("info", "   RandCrack ingested the 624 values, but the MT state won't sync with real noise.")
     else:
-        yield ev("crit", "   ✓ Estado interno del MT19937 RECONSTRUIDO. El generador quedó clonado.")
+        yield ev("crit", "   ✓ MT19937 internal state RECONSTRUCTED. The generator is now cloned.")
 
     time.sleep(0.3)
-    yield ev("phase", "FASE 3 · Predicción — calculando el PRÓXIMO token de reseteo.")
+    yield ev("phase", "PHASE 3 · Prediction — computing the NEXT reset token.")
     try:
         predicted = 0
         for i in range(8):
             predicted |= rc.predict_getrandbits(32) << (32 * i)
     except Exception as e:
-        yield ev("good", f"🛡️  MITIGADO: sin estructura no hay predicción posible ({e}).")
-        yield ev("done", "Ataque fallido.", success=False, target=target)
+        yield ev("good", f"🛡️  MITIGATED: no structure means no prediction is possible ({e}).")
+        yield ev("done", "Attack failed.", success=False, target=target)
         return
-    yield ev("dim", f"   token predicho: {str(predicted)[:46]}…")
+    yield ev("dim", f"   predicted token: {str(predicted)[:46]}…")
 
     time.sleep(0.3)
-    yield ev("phase", "FASE 4 · Secuestro — disparo el reseteo REAL de 'admin' y uso el token predicho.")
+    yield ev("phase", "PHASE 4 · Takeover — firing the REAL 'admin' reset and using the predicted token.")
     actual = int(generate_secure_token()) if secure else random.getrandbits(256)
     cur = db.cursor()
     cur.execute("UPDATE users SET reset_token=? WHERE username='admin'", (str(actual),))
@@ -260,21 +260,21 @@ def _attack_events(target: str):
     if str(predicted) == real_token:
         cur.execute("UPDATE users SET password='pwned_by_maelstrom', reset_token=NULL WHERE username='admin'")
         db.commit()
-        yield ev("crit", "🔓  PWNED: el token predicho COINCIDIÓ. Cambié la contraseña de admin.")
+        yield ev("crit", "🔓  PWNED: the predicted token MATCHED. Changed admin's password.")
         time.sleep(0.25)
-        yield ev("crit", "🔓  Login como admin EXITOSO → cuenta secuestrada por completo.")
-        yield ev("done", "Cuenta comprometida.", success=True, target=target)
+        yield ev("crit", "🔓  Logged in as admin SUCCESSFULLY → account fully hijacked.")
+        yield ev("done", "Account compromised.", success=True, target=target)
     else:
-        yield ev("good", "   ✗ El token predicho NO coincide con el real.")
-        yield ev("dim", f"   predicho …{str(predicted)[-14:]}  ≠  real …{real_token[-14:]}")
-        yield ev("good", "🛡️  MITIGADO: el token sale de BLAKE2b(cámara‖cuántico‖urandom). No hay patrón que clonar.")
-        yield ev("done", "Ataque fallido.", success=False, target=target)
+        yield ev("good", "   ✗ The predicted token does NOT match the real one.")
+        yield ev("dim", f"   predicted …{str(predicted)[-14:]}  ≠  real …{real_token[-14:]}")
+        yield ev("good", "🛡️  MITIGATED: the token comes from BLAKE2b(camera‖quantum‖urandom). No pattern to clone.")
+        yield ev("done", "Attack failed.", success=False, target=target)
 
 
 @app.get("/demo/attack")
 def demo_attack(target: str = "vulnerable"):
     if target not in ("vulnerable", "secure"):
-        raise HTTPException(status_code=400, detail="target debe ser 'vulnerable' o 'secure'")
+        raise HTTPException(status_code=400, detail="target must be 'vulnerable' or 'secure'")
     return StreamingResponse(_attack_events(target), media_type="application/x-ndjson")
 
 
@@ -315,10 +315,10 @@ def _grid_select(provider):
         idx = get_quantum_random_int(num_bits=QUBITS)   # medición cuántica real (Hadamard)
         bits = format(idx, f"0{QUBITS}b")
         if idx >= MAX_INDEX:
-            rolls.append({"bits": bits, "index": idx, "ok": False, "reason": "fuera de rango"})
+            rolls.append({"bits": bits, "index": idx, "ok": False, "reason": "out of range"})
             continue
         if idx in seen:
-            rolls.append({"bits": bits, "index": idx, "ok": False, "reason": "repetido"})
+            rolls.append({"bits": bits, "index": idx, "ok": False, "reason": "repeat"})
             continue
         seen.add(idx)
         rolls.append({"bits": bits, "index": idx, "ok": True, "reason": ""})

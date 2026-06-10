@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>MAELSTROM · Demo de ataque</title>
+<title>MAELSTROM · Attack demo</title>
 <style>
   :root{--bg:#0b0e14;--panel:#11161f;--panel2:#0d121a;--border:#222b3a;--txt:#c9d4e3;
     --muted:#7d8aa0;--accent:#58a6ff;--cyan:#39d4d4;--red:#ff5c5c;--green:#3fb950;--yellow:#e3b341}
@@ -59,51 +59,51 @@
 </head>
 <body>
 <header>
-  <div class="brand"><div class="logo">🌀</div><div>MAELSTROM <small>demo de ataque · account takeover</small></div></div>
+  <div class="brand"><div class="logo">🌀</div><div>MAELSTROM <small>attack demo · account takeover</small></div></div>
   <nav class="steps">
-    <a href="index.html">Inicio</a>
-    <a href="backstage.html">① Cómo funciona</a>
-    <a href="demo.html" class="active">② Demo de ataque</a>
+    <a href="index.html">Home</a>
+    <a href="backstage.html">① How it works</a>
+    <a href="demo.html" class="active">② Attack demo</a>
     <a href="brainrot.html" class="egg">🎰</a>
   </nav>
 </header>
 
 <main>
   <section class="card">
-    <h2>📷 Fuente de entropía física</h2>
-    <p class="sub">Live feed de la cámara. Cada token seguro nace, en parte, de este caos del mundo real.</p>
+    <h2>📷 Physical entropy source</h2>
+    <p class="sub">Live camera feed. Every secure token is born, in part, from this real-world chaos.</p>
     <div class="feed-wrap">
-      <div class="chip"><span class="dot" id="feed-dot"></span><span id="feed-status">conectando…</span></div>
+      <div class="chip"><span class="dot" id="feed-dot"></span><span id="feed-status">connecting…</span></div>
       <img id="feed" alt="live feed" style="display:none" />
-      <div class="feed-ph" id="feed-ph">Cargando live feed…</div>
+      <div class="feed-ph" id="feed-ph">Loading live feed…</div>
     </div>
     <div class="legend">
-      🔓 <b>Endpoint vulnerable</b>: genera el token con <code>random.getrandbits()</code> (Mersenne Twister, predecible).<br>
-      🛡️ <b>Endpoint seguro</b>: lo genera con <b>MAELSTROM</b> = BLAKE2b(cámara ‖ cuántico ‖ urandom).<br>
-      El atacante hace lo mismo en ambos. Mirá la consola →
+      🔓 <b>Vulnerable endpoint</b>: generates the token with <code>random.getrandbits()</code> (Mersenne Twister, predictable).<br>
+      🛡️ <b>Secure endpoint</b>: generates it with <b>MAELSTROM</b> = BLAKE2b(camera ‖ quantum ‖ urandom).<br>
+      The attacker does the same against both. Watch the console →
     </div>
   </section>
 
   <section class="card">
-    <h2>🎯 Ataque de predicción de token</h2>
-    <p class="sub">El atacante recolecta tokens públicos, clona el generador y predice el reseteo de <code>admin</code>.</p>
+    <h2>🎯 Token prediction attack</h2>
+    <p class="sub">The attacker collects public tokens, clones the generator and predicts <code>admin</code>'s reset.</p>
     <div class="btns">
       <button class="attack vuln" id="btn-vuln" onclick="runAttack('vulnerable')">
-        🔓 Atacar endpoint VULNERABLE<span>random.getrandbits → Mersenne Twister</span>
+        🔓 Attack the VULNERABLE endpoint<span>random.getrandbits → Mersenne Twister</span>
       </button>
       <button class="attack safe" id="btn-safe" onclick="runAttack('secure')">
-        🛡️ Atacar endpoint SEGURO<span>MAELSTROM (cámara + cuántico + urandom)</span>
+        🛡️ Attack the SECURE endpoint<span>MAELSTROM (camera + quantum + urandom)</span>
       </button>
     </div>
     <div class="banner" id="banner"></div>
     <div class="term" id="term"></div>
-    <div class="hint">El ataque corre de verdad en el backend (RandCrack sobre el Mersenne Twister). Cada corrida resetea a <code>admin</code> para repetir.</div>
+    <div class="hint">The attack really runs in the backend (RandCrack on the Mersenne Twister). Each run resets <code>admin</code> so you can repeat it.</div>
   </section>
 </main>
 
 <div class="footnav">
-  <a href="backstage.html">← Cómo funciona</a>
-  <a class="next" href="brainrot.html">🎰 Probá el casino (easter egg) →</a>
+  <a href="backstage.html">← How it works</a>
+  <a class="next" href="brainrot.html">🎰 Try the casino (easter egg) →</a>
 </div>
 
 <script>
@@ -114,16 +114,16 @@
   (async function loadFeed(){
     const dot=document.getElementById("feed-dot"),status=document.getElementById("feed-status"),img=document.getElementById("feed"),ph=document.getElementById("feed-ph");
     try{ const {url}=await (await fetch(`${API}/feed_url`)).json();
-      if(!url){status.textContent="sin URL de feed";dot.classList.add("off");ph.textContent="No hay VIDEO_FEED_URL.";return;}
-      img.onload=()=>{img.style.display="block";ph.style.display="none";dot.classList.remove("off");status.textContent="EN VIVO";};
-      img.onerror=()=>{dot.classList.add("off");status.textContent="feed no disponible";ph.textContent="El navegador no pudo abrir el stream. El ataque funciona igual.";};
+      if(!url){status.textContent="no feed URL";dot.classList.add("off");ph.textContent="No VIDEO_FEED_URL set.";return;}
+      img.onload=()=>{img.style.display="block";ph.style.display="none";dot.classList.remove("off");status.textContent="LIVE";};
+      img.onerror=()=>{dot.classList.add("off");status.textContent="feed unavailable";ph.textContent="The browser couldn't open the stream. The attack works anyway.";};
       img.src=url;
-    }catch(e){dot.classList.add("off");status.textContent="API offline";ph.textContent="No se pudo contactar la API en "+API;}
+    }catch(e){dot.classList.add("off");status.textContent="API offline";ph.textContent="Couldn't reach the API at "+API;}
   })();
 
   function log(level,msg){const d=document.createElement("div");d.className="ln l-"+level;d.textContent=msg;term.appendChild(d);term.scrollTop=term.scrollHeight;}
-  function showBanner(s){ if(s){banner.className="banner pwned";banner.innerHTML='<span class="big">🔓</span> PWNED — cuenta de admin secuestrada con un token predicho.';}
-    else{banner.className="banner safe";banner.innerHTML='<span class="big">🛡️</span> MITIGADO — la entropía híbrida no se puede predecir.';} }
+  function showBanner(s){ if(s){banner.className="banner pwned";banner.innerHTML='<span class="big">🔓</span> PWNED — admin account hijacked with a predicted token.';}
+    else{banner.className="banner safe";banner.innerHTML='<span class="big">🛡️</span> MITIGATED — hybrid entropy can\'t be predicted.';} }
 
   async function runAttack(target){
     if(running)return; running=true; term.innerHTML=""; banner.style.display="none"; banner.className="banner";
@@ -137,7 +137,7 @@
         while((i=buf.indexOf("\n"))>=0){ const line=buf.slice(0,i).trim(); buf=buf.slice(i+1);
           if(!line)continue; const ev=JSON.parse(line);
           if(ev.level==="done")showBanner(ev.success); else log(ev.level,ev.msg); } }
-    }catch(e){ log("crit","✗ Error de conexión con la API: "+e.message); log("dim","¿Está corriendo  python api.py  en "+API+" ?"); }
+    }catch(e){ log("crit","✗ API connection error: "+e.message); log("dim","Is  python api.py  running at "+API+" ?"); }
     finally{ running=false; document.getElementById("btn-vuln").disabled=false; document.getElementById("btn-safe").disabled=false; }
   }
 </script>
