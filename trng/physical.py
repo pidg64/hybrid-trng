@@ -81,15 +81,19 @@ def _get_image(image_path: str):
     return cached
 
 
-def capture_hybrid_entropy(image_path: str = "frame.png"):
-    """Devuelve ``(x, y, r, g, b)``: coordenadas cuánticas + RGB blanqueado.
+def capture_entropy(px, width: int, height: int):
+    """Extrae ``(x, y, r, g, b)`` de un frame YA cargado: coordenadas cuánticas +
+    RGB blanqueado.
+
+    ``px`` es el accesor de píxeles (``img.load()``). Separar esto del cargado de
+    la imagen permite que la misma lógica de entropía sirva tanto para una foto
+    fija como para un frame de live feed (ver ``frames.py``), y cosechar muchos
+    bytes de un mismo frame sin recargarlo.
 
     Los canales ``r, g, b`` ya vienen con whitening cuántico (XOR contra una
     máscara qiskit independiente), por lo que son ruido blanco apto para usar
     como bytes de entropía física.
     """
-    _img, width, height, px = _get_image(image_path)
-
     # 1. Coordenadas con Rejection Sampling (elimina Modulo Bias).
     bits_x = width.bit_length()
     while True:
@@ -115,3 +119,13 @@ def capture_hybrid_entropy(image_path: str = "frame.png"):
     b = pixel_color[2] ^ mask_b
 
     return x, y, r, g, b
+
+
+def capture_hybrid_entropy(image_path: str = "frame.png"):
+    """Compatibilidad: extrae entropía de una imagen estática (cacheada).
+
+    Lo usa el endpoint ``/raw_entropy`` del dashboard. Equivale a cargar el frame
+    y llamar a ``capture_entropy``.
+    """
+    _img, width, height, px = _get_image(image_path)
+    return capture_entropy(px, width, height)

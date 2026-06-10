@@ -21,9 +21,12 @@ from .sources import HybridSource, PhysicalSource, UrandomSource
 
 _MODES = {
     "urandom": lambda args: UrandomSource(),
-    "physical": lambda args: PhysicalSource(image_path=args.image),
+    "physical": lambda args: PhysicalSource(
+        image_path=args.image, video_url=args.video_url
+    ),
     "hybrid": lambda args: HybridSource(
-        physical=PhysicalSource(image_path=args.image), algo=args.algo
+        physical=PhysicalSource(image_path=args.image, video_url=args.video_url),
+        algo=args.algo,
     ),
 }
 
@@ -39,7 +42,11 @@ def main(argv=None):
     parser.add_argument("--bits", type=int, default=1_000_000,
                         help="Cantidad de bits a generar (default 1.000.000).")
     parser.add_argument("--out", required=True, help="Archivo binario de salida.")
-    parser.add_argument("--image", default="frame.png", help="Imagen fuente física.")
+    parser.add_argument("--image", default="frame.png", help="Imagen fuente física (fallback).")
+    parser.add_argument("--video-url", default=None,
+                        help="URL/índice del live feed para la fuente física "
+                             "(ej. rtsp://..., http://..., o '0' para webcam). "
+                             "Si se omite, usa la env VIDEO_FEED_URL o la imagen estática.")
     parser.add_argument("--algo", default="blake2b", choices=["blake2b", "sha256"],
                         help="Hash de mezcla para el modo hybrid.")
     args = parser.parse_args(argv)
@@ -56,14 +63,18 @@ def main(argv=None):
         print("[*] Aviso: el modo físico corre qiskit por captura; 1M bits puede tardar.")
 
     t0 = time.time()
-    data = source.get_bytes(n_bytes)
-    elapsed = time.time() - t0
+    try:
+        data = source.get_bytes(n_bytes)
+    finally:
+        elapsed = time.time() - t0
+        status = source.health().value
+        source.close()  # detiene el hilo del stream si lo hubiera
 
     with open(args.out, "wb") as f:
         f.write(data)
 
     print(f"[*] Listo: {len(data)} bytes escritos en {elapsed:.1f}s. "
-          f"Estado fuente: {source.health().value}")
+          f"Estado fuente: {status}")
     return 0
 
 

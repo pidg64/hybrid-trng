@@ -4,7 +4,7 @@ Abstracción de fuentes de entropía.
 Define la interfaz común ``EntropySource`` y sus tres implementaciones:
 
 * ``UrandomSource``  — CSPRNG del kernel (fuente PRIMARIA).
-* ``PhysicalSource`` — foto + qiskit (fuente SECUNDARIA aditiva, con health check).
+* ``PhysicalSource`` — foto o live feed + qiskit (fuente SECUNDARIA aditiva).
 * ``HybridSource``   — mezcla criptográfica de ambas (modelo LavaRand).
 
 Gracias a esta abstracción, la suite NIST puede pedir bytes a cualquiera de las
@@ -18,9 +18,9 @@ import secrets
 from enum import Enum
 
 from .csprng import CounterCSPRNG
-from .health import FrozenFeedDetector
+from .frames import default_provider
 from .mixer import mix
-from .physical import capture_hybrid_entropy
+from .physical import capture_entropy
 
 logger = logging.getLogger("trng.sources")
 
@@ -47,6 +47,9 @@ class EntropySource(abc.ABC):
         """Estado de la fuente. Por defecto OK; las fuentes con sensores la sobreescriben."""
         return HealthStatus.OK
 
+    def close(self) -> None:
+        """Libera recursos (hilos, captura). No-op por defecto."""
+
 
 class UrandomSource(EntropySource):
     """Fuente PRIMARIA: CSPRNG del sistema operativo.
@@ -62,20 +65,41 @@ class UrandomSource(EntropySource):
 
 
 class PhysicalSource(EntropySource):
-    """Fuente SECUNDARIA: foto + qiskit (con whitening cuántico).
+    """Fuente SECUNDARIA: frame + qiskit (con whitening cuántico).
 
-    Cada captura aporta 3 bytes de entropía física (canales R, G, B ya
-    blanqueados). Incluye un health check que detecta capturas idénticas
-    consecutivas (feed congelado) y degradación elegante: si qiskit/PIL lanzan
-    una excepción, la fuente se marca FAILED y devuelve los bytes que pudo reunir
-    (cero si ninguno), dejando que ``HybridSource`` decida cómo seguir.
+    El frame lo entrega un ``FrameProvider`` (ver ``frames.py``): una foto fija
+    (``StaticImage``) o un live feed por OpenCV (``VideoStream``). Por defecto se
+    elige según la URL del feed (parámetro ``video_url`` o env ``VIDEO_FEED_URL``);
+    si no hay, cae a la foto ``image_path``.
+
+    Eficiencia ("1 frame -> muchos bytes"): por cada frame que pide al provider,
+    cosecha hasta ``bytes_per_frame`` bytes muestreando muchos píxeles, en vez de
+    pedir un frame nuevo por captura. Así la velocidad no queda atada al framerate
+    del stream.
+
+    Degradación elegante:
+      * Si el provider no puede entregar frame (stream caído, qiskit/PIL fallan),
+        la fuente se marca FAILED y devuelve los bytes que pudo reunir (cero si
+        ninguno), dejando que ``HybridSource`` siga con urandom.
+      * Si el live feed se congela, el provider lo reporta como ``degraded`` (lo
+        detecta sobre el frame CRUDO) y la fuente devuelve DEGRADED.
     """
 
     name = "physical"
 
-    def __init__(self, image_path: str = "frame.png", max_identical: int = 3):
+    def __init__(
+        self,
+        image_path: str = "frame.png",
+        max_identical: int = 30,
+        frame_provider=None,
+        video_url: str | None = None,
+        bytes_per_frame: int = 4096,
+    ):
         self.image_path = image_path
-        self._detector = FrozenFeedDetector(max_identical=max_identical)
+        self._provider = frame_provider or default_provider(
+            image_path, url=video_url, max_identical=max_identical
+        )
+        self._bytes_per_frame = bytes_per_frame
         self._failed = False
 
     def get_bytes(self, n: int) -> bytes:
@@ -83,29 +107,36 @@ class PhysicalSource(EntropySource):
         next_log = _LOG_EVERY_BITS
         while len(out) < n:
             try:
-                _, _, r, g, b = capture_hybrid_entropy(self.image_path)
-            except Exception as exc:  # qiskit / PIL / lo que sea
+                _img, width, height, px = self._provider.get_frame()
+            except Exception as exc:  # stream caído / qiskit / PIL / lo que sea
                 self._failed = True
                 logger.warning(
-                    "Fuente física FAILED durante la captura (%s). "
+                    "Fuente física FAILED al obtener frame (%s). "
                     "Se devuelven %d/%d bytes recolectados.",
                     exc, len(out), n,
                 )
                 break
-            reading = bytes((r, g, b))
-            self._detector.observe(reading)
-            out.extend(reading)
-            if len(out) * 8 >= next_log:
-                logger.info("[physical] %d bits generados", min(len(out) * 8, n * 8))
-                next_log += _LOG_EVERY_BITS
+            # 1 frame -> muchos bytes: cosechamos del MISMO frame hasta el budget.
+            harvested = 0
+            while len(out) < n and harvested < self._bytes_per_frame:
+                _, _, r, g, b = capture_entropy(px, width, height)
+                out.extend((r, g, b))
+                harvested += 3
+                if len(out) * 8 >= next_log:
+                    logger.info("[physical] %d bits generados", min(len(out) * 8, n * 8))
+                    next_log += _LOG_EVERY_BITS
         return bytes(out[:n])
 
     def health(self) -> HealthStatus:
         if self._failed:
             return HealthStatus.FAILED
-        if self._detector.degraded:
+        if getattr(self._provider, "degraded", False):
             return HealthStatus.DEGRADED
         return HealthStatus.OK
+
+    def close(self) -> None:
+        """Libera el provider (detiene el hilo del stream, si aplica)."""
+        self._provider.close()
 
 
 class HybridSource(EntropySource):
@@ -179,3 +210,7 @@ class HybridSource(EntropySource):
         # híbrido nunca FALLA mientras urandom esté disponible.
         phys = self.physical.health()
         return HealthStatus.OK if phys == HealthStatus.OK else HealthStatus.DEGRADED
+
+    def close(self) -> None:
+        """Libera la fuente física (detiene el hilo del stream, si aplica)."""
+        self.physical.close()

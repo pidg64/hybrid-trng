@@ -12,6 +12,7 @@ El diseño permite correr la suite NIST SP 800-22 sobre cualquiera de las tres
 fuentes de forma aislada para compararlas.
 """
 
+from .frames import FrameProvider, StaticImage, VideoStream, default_provider
 from .sources import (
     EntropySource,
     HealthStatus,
@@ -26,4 +27,8 @@ __all__ = [
     "UrandomSource",
     "PhysicalSource",
     "HybridSource",
+    "FrameProvider",
+    "StaticImage",
+    "VideoStream",
+    "default_provider",
 ]
