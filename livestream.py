@@ -65,8 +65,8 @@ def main():
     # Crear el provider (VideoStream o StaticImage)
     print("[*] Inicializando provider de frames...")
     
-    # Prioridad: parámetro --video > variable de entorno ENV_VIDEO_URL > StaticImage
-    url = args.video or os.environ.get(ENV_VIDEO_URL)
+    # Prioridad: --video > env var VIDEO_FEED_URL > ENV_VIDEO_URL (URL hardcodeada) > StaticImage
+    url = args.video or os.environ.get("VIDEO_FEED_URL") or ENV_VIDEO_URL
     if url:
         provider = VideoStream(url)
     else:

@@ -236,9 +236,12 @@ def default_provider(
     url: str | None = None,
     max_identical: int = 30,
 ) -> FrameProvider:
-    """Elige el provider: ``VideoStream`` si hay URL (parámetro o env
-    ``VIDEO_FEED_URL``), si no ``StaticImage`` con la foto fija."""
-    url = url or os.environ.get(ENV_VIDEO_URL)
+    """Elige el provider: ``VideoStream`` si hay URL, si no ``StaticImage``.
+
+    Prioridad de la URL: parámetro explícito > env var ``VIDEO_FEED_URL`` >
+    ``ENV_VIDEO_URL`` (URL hardcodeada de la demo). Como ``ENV_VIDEO_URL`` tiene
+    la URL del feed, por defecto el live feed queda activo sin setear nada."""
+    url = url or os.environ.get("VIDEO_FEED_URL") or ENV_VIDEO_URL
     if url:
         return VideoStream(url, max_identical=max_identical)
     return StaticImage(image_path)
