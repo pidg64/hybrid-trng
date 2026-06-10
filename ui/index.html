@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MAELSTROM · Entropía híbrida cuántica</title>
+<style>
+  :root{--bg:#0b0e14;--panel:#11161f;--panel2:#0d121a;--border:#222b3a;--txt:#c9d4e3;
+    --muted:#7d8aa0;--accent:#58a6ff;--cyan:#39d4d4;--red:#ff5c5c;--green:#3fb950;--purple:#a988ff}
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 600px at 80% -10%,rgba(57,212,212,.10),transparent 60%),
+      radial-gradient(1000px 500px at -10% 110%,rgba(169,136,255,.10),transparent 55%),var(--bg)}
+  header{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px}
+  .brand{display:flex;align-items:center;gap:12px;font-weight:800;letter-spacing:1px}
+  .logo{width:36px;height:36px;border-radius:10px;background:conic-gradient(from 0deg,#39d4d4,#58a6ff,#a020f0,#39d4d4);
+    display:grid;place-items:center;font-size:19px;box-shadow:0 0 22px rgba(88,166,255,.5);animation:spin 9s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .brand small{display:block;color:var(--muted);font-weight:500;font-size:.72rem;letter-spacing:.2px}
+  .steps{display:flex;gap:8px;flex-wrap:wrap}
+  .steps a{color:var(--muted);text-decoration:none;font-size:.86rem;padding:8px 13px;border:1px solid var(--border);border-radius:9px;transition:.2s}
+  .steps a:hover{color:var(--txt);border-color:var(--accent);background:rgba(88,166,255,.08)}
+  .steps a.active{color:#fff;border-color:var(--cyan);background:rgba(57,212,212,.12)}
+  .steps a.egg{border-style:dashed;border-color:#ffd84d55;color:#ffd84d}
+  .hero{max-width:900px;margin:0 auto;padding:64px 26px 30px;text-align:center}
+  .hero h1{font-size:clamp(2.6rem,9vw,5.5rem);margin:0;letter-spacing:3px;font-weight:900;
+    background:linear-gradient(90deg,#39d4d4,#58a6ff,#a988ff,#39d4d4);background-size:300%;
+    -webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 5s linear infinite;
+    filter:drop-shadow(0 0 26px rgba(88,166,255,.35))}
+  @keyframes shine{to{background-position:300%}}
+  .hero p.tag{font-size:clamp(1rem,3vw,1.35rem);color:var(--cyan);margin:10px 0 4px;font-weight:600}
+  .hero p.desc{color:var(--muted);font-size:1.02rem;line-height:1.6;max-width:680px;margin:14px auto 0}
+  .cta{display:inline-flex;gap:10px;align-items:center;margin-top:30px;padding:16px 30px;border-radius:14px;
+    font-size:1.1rem;font-weight:800;color:#06121a;text-decoration:none;
+    background:linear-gradient(135deg,#39d4d4,#58a6ff);box-shadow:0 10px 30px rgba(57,212,212,.35);transition:.18s}
+  .cta:hover{transform:translateY(-2px);box-shadow:0 14px 40px rgba(57,212,212,.5)}
+  .cta.ghost{background:transparent;color:var(--txt);border:1px solid var(--border);box-shadow:none}
+  .cta.ghost:hover{border-color:var(--accent)}
+  .ctas{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+  .cards{max-width:1080px;margin:50px auto 60px;padding:0 26px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  @media (max-width:820px){.cards{grid-template-columns:1fr}}
+  .card{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--border);
+    border-radius:16px;padding:22px;box-shadow:0 8px 30px rgba(0,0,0,.35)}
+  .card .ic{font-size:1.8rem}
+  .card h3{margin:10px 0 6px;font-size:1.05rem}
+  .card p{color:var(--muted);font-size:.9rem;line-height:1.55;margin:0}
+  .num{font-size:.72rem;color:var(--purple);font-weight:800;letter-spacing:.5px}
+  code{background:#0a0f17;border:1px solid var(--border);padding:1px 6px;border-radius:6px;color:var(--accent)}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><div class="logo">🌀</div><div>MAELSTROM <small>entropía híbrida: cámara + cuántico + urandom</small></div></div>
+  <nav class="steps">
+    <a href="index.html" class="active">Inicio</a>
+    <a href="backstage.html">① Cómo funciona</a>
+    <a href="demo.html">② Demo de ataque</a>
+    <a href="brainrot.html" class="egg">🎰</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <h1>MAELSTROM</h1>
+  <p class="tag">aleatoriedad imposible de predecir, del caos del mundo real</p>
+  <p class="desc">
+    La mayoría de los sistemas generan tokens con PRNGs <b>predecibles</b> (como el Mersenne Twister).
+    MAELSTROM mezcla <b>caos físico</b> (un live feed de cámara), <b>aleatoriedad cuántica</b> (qiskit) y el
+    <b>CSPRNG del sistema</b> con <code>BLAKE2b</code> — y por el <i>Leftover Hash Lemma</i>, el resultado es
+    tan fuerte como la mejor de sus fuentes. Recorré la demo 👇
+  </p>
+  <div class="ctas">
+    <a class="cta" href="backstage.html">Empezar el recorrido →</a>
+    <a class="cta ghost" href="demo.html">Ir directo al ataque 🎯</a>
+  </div>
+</section>
+
+<section class="cards">
+  <div class="card">
+    <div class="ic">🎲</div><div class="num">EL PROBLEMA</div>
+    <h3>RNGs predecibles</h3>
+    <p>Con <code>random.getrandbits()</code> un atacante puede clonar el generador y predecir tu próximo token de reseteo. Account takeover en minutos.</p>
+  </div>
+  <div class="card">
+    <div class="ic">🌀</div><div class="num">LA SOLUCIÓN</div>
+    <h3>Entropía híbrida</h3>
+    <p>Píxeles elegidos por mediciones cuánticas (Hadamard) sobre un live feed, blanqueados con XOR y mezclados con urandom vía BLAKE2b.</p>
+  </div>
+  <div class="card">
+    <div class="ic">🔬</div><div class="num">LA PRUEBA</div>
+    <h3>Atacá ambos en vivo</h3>
+    <p>El mismo ataque contra el endpoint vulnerable (<b>PWNED</b>) y contra MAELSTROM (<b>MITIGADO</b>), con logs en tiempo real.</p>
+  </div>
+</section>
+</body>
+</html>

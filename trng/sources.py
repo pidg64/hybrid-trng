@@ -5,7 +5,7 @@ Define la interfaz común ``EntropySource`` y sus tres implementaciones:
 
 * ``UrandomSource``  — CSPRNG del kernel (fuente PRIMARIA).
 * ``PhysicalSource`` — foto o live feed + qiskit (fuente SECUNDARIA aditiva).
-* ``HybridSource``   — mezcla criptográfica de ambas (modelo LavaRand).
+* ``HybridSource``   — mezcla criptográfica de ambas (MAELSTROM; modelo tipo Cloudflare LavaRand).
 
 Gracias a esta abstracción, la suite NIST puede pedir bytes a cualquiera de las
 tres con la misma llamada ``.get_bytes(n)`` y compararlas en igualdad de
@@ -140,7 +140,7 @@ class PhysicalSource(EntropySource):
 
 
 class HybridSource(EntropySource):
-    """Fuente COMBINADA (modelo LavaRand / defense in depth).
+    """Fuente COMBINADA de MAELSTROM (modelo tipo Cloudflare LavaRand / defense in depth).
 
     Pipeline::
 

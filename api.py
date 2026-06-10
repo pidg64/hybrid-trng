@@ -10,21 +10,24 @@ import uvicorn
 from PIL import Image
 from pydantic import BaseModel
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import StreamingResponse, FileResponse
+from fastapi.responses import StreamingResponse, RedirectResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
 from randcrack import RandCrack
 
-# Motor de entropía refactorizado (defense in depth: físico + urandom).
-# capture_hybrid_entropy alimenta el dashboard de auditoría visual;
-# HybridSource alimenta la generación de tokens (físico secundario + urandom).
-from trng.physical import capture_hybrid_entropy, capture_entropy
+# Motor de entropía (defense in depth: físico + urandom).
+# capture_hybrid_entropy alimenta el dashboard de entropía cruda;
+# get_quantum_random_int es el motor cuántico (Hadamard) que usa la pantalla de fondo;
+# HybridSource alimenta la generación de tokens.
+from trng.physical import capture_hybrid_entropy, get_quantum_random_int
 from trng.sources import HybridSource
 from trng.frames import ENV_VIDEO_URL
 
-app = FastAPI(title="Hybrid-TRNG API")
+app = FastAPI(title="MAELSTROM API")
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+UI_DIR = os.path.join(BASE_DIR, "ui")
 
 # Fuente combinada global: mezcla físico + urandom con BLAKE2b y expande vía DRBG.
 # Su fuente física usa el live feed (ver trng.frames.default_provider).
@@ -101,32 +104,23 @@ def request_reset(username: str):
     db.commit()
     return {"message": f"Token enviado al email de {username}", "token": token}
 
-# 2. ENDPOINT SEGURO (NUEVO)
+# 2. ENDPOINT SEGURO
 @app.post("/secure_request_reset/{username}")
 def secure_request_reset(username: str):
     cursor = db.cursor()
     cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
     if not cursor.fetchone():
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
-    # Usamos nuestra propia fuente de entropía
     token = generate_secure_token()
     cursor.execute("UPDATE users SET reset_token = ? WHERE username = ?", (token, username))
     db.commit()
     return {"message": f"Token seguro enviado al email de {username}", "token": token}
 
-# 3. ENDPOINT PARA DASHBOARD
+# 3. ENDPOINT PARA DASHBOARD DE ENTROPÍA CRUDA
 @app.get("/raw_entropy")
 def get_raw_entropy():
-    # Consumimos la misma función base de forma 100% honesta
     x, y, r, g, b = capture_hybrid_entropy()
-
-    return {
-        "x_coord": x,
-        "y_coord": y,
-        "r": r,
-        "g": g,
-        "b": b
-    }
+    return {"x_coord": x, "y_coord": y, "r": r, "g": g, "b": b}
 
 # ENDPOINTS COMUNES (Cambio de pass y Login)
 @app.post("/change_password")
@@ -150,63 +144,58 @@ def login(data: LoginRequest):
 
 
 # ============================================================================
-#  DEMO / UI  —  pantallas didácticas para la presentación al jurado
+#  RUTAS DE LA UI  —  recorrido del usuario (todo vive en ui/)
 # ============================================================================
 
 @app.get("/")
-@app.get("/demo")
-def page_demo():
-    """Pantalla 1: demo del ataque en tiempo real."""
-    return FileResponse(os.path.join(BASE_DIR, "demo.html"))
-
+def page_home():
+    return RedirectResponse("/ui/index.html")
 
 @app.get("/backstage")
 def page_backstage():
-    """Pantalla 2: funcionamiento de fondo (frame + píxeles que elige qiskit)."""
-    return FileResponse(os.path.join(BASE_DIR, "backstage.html"))
+    return RedirectResponse("/ui/backstage.html")
 
+@app.get("/demo")
+def page_demo():
+    return RedirectResponse("/ui/demo.html")
 
 @app.get("/brainrot")
 def page_brainrot():
-    """Easter egg: LavaRand Casino 🎰 (memes + tragamonedas con entropía real)."""
-    return FileResponse(os.path.join(BASE_DIR, "brainrot.html"))
+    return RedirectResponse("/ui/brainrot.html")
 
 
 @app.get("/feed_url")
 def feed_url():
     """URL del live feed para que el navegador muestre la cámara.
-
-    OJO: para la demo devolvemos la URL tal cual (puede incluir token). Es un
-    servidor local de presentación, no producción.
-    """
+    Para la demo devolvemos la URL tal cual (servidor local de presentación)."""
     return {"url": ENV_VIDEO_URL}
 
 
+# ============================================================================
+#  DEMO DEL ATAQUE  (stream NDJSON en vivo)
+# ============================================================================
+
 def _reset_demo_state():
-    """Deja a 'admin' en estado inicial para poder repetir la demo."""
     cur = db.cursor()
     cur.execute("UPDATE users SET password='SuperSecret123', reset_token=NULL WHERE username='admin'")
     db.commit()
 
 
 def _token_chunks(token_256: int):
-    """Parte un token de 256 bits en 8 enteros de 32 bits (orden del MT)."""
     return [(token_256 >> (32 * i)) & 0xFFFFFFFF for i in range(8)]
 
 
 def _attack_events(target: str):
-    """Generador del ataque en vivo (NDJSON). Self-contained: no hace HTTP a sí
-    mismo, opera directo sobre el RNG y la 'base de datos'.
-
-    target='vulnerable' -> tokens de random.getrandbits (Mersenne Twister) -> PWNED.
-    target='secure'     -> tokens de HybridSource (LavaRand)               -> MITIGADO.
+    """Ataque en vivo (NDJSON). Self-contained: opera directo sobre el RNG y la 'db'.
+    target='vulnerable' -> random.getrandbits (Mersenne Twister) -> PWNED.
+    target='secure'     -> HybridSource (MAELSTROM)              -> MITIGADO.
     """
     secure = (target == "secure")
 
     def ev(level, msg, **extra):
         return json.dumps({"level": level, "msg": msg, **extra}) + "\n"
 
-    label = ("SEGURO — LavaRand: cámara + cuántico + urandom (BLAKE2b)"
+    label = ("SEGURO — MAELSTROM: cámara + cuántico + urandom (BLAKE2b)"
              if secure else
              "VULNERABLE — random.getrandbits() → Mersenne Twister")
 
@@ -269,7 +258,7 @@ def _attack_events(target: str):
     time.sleep(0.3)
 
     if str(predicted) == real_token:
-        cur.execute("UPDATE users SET password='pwned_by_lavarand', reset_token=NULL WHERE username='admin'")
+        cur.execute("UPDATE users SET password='pwned_by_maelstrom', reset_token=NULL WHERE username='admin'")
         db.commit()
         yield ev("crit", "🔓  PWNED: el token predicho COINCIDIÓ. Cambié la contraseña de admin.")
         time.sleep(0.25)
@@ -289,57 +278,94 @@ def demo_attack(target: str = "vulnerable"):
     return StreamingResponse(_attack_events(target), media_type="application/x-ndjson")
 
 
-def _analyze_provider(provider, n: int):
-    """Toma el frame actual del provider y muestra qué píxeles eligió qiskit."""
+# ============================================================================
+#  PANTALLA DE FONDO  —  selección cuántica por grilla (fiel a seleccion_qiskit.py)
+# ============================================================================
+#  Sobre el frame actual: recorto una región, la divido en una grilla GRID×GRID,
+#  y qiskit (Hadamard sobre QUBITS qubits) elige N_SELECT índices con Rejection
+#  Sampling sin reposición. Para cada celda elegida muestro el pixel crudo, la
+#  máscara cuántica y el XOR (whitening). NOTA: esto es solo la visualización
+#  didáctica; el motor de tokens (capture_entropy) no cambia.
+
+GRID = 30                 # 30x30 = 900 celdas
+N_SELECT = 32             # cuántas celdas elige qiskit
+QUBITS = 10               # 2^10 = 1024 >= 900
+MAX_INDEX = GRID * GRID   # 900
+MAX_ROLLS = 400           # tope de tiradas (incluye rechazos) para no colgarse
+
+
+def _b64_jpeg(im, quality=82):
+    buf = io.BytesIO()
+    im.save(buf, "JPEG", quality=quality)
+    return base64.b64encode(buf.getvalue()).decode()
+
+
+def _grid_select(provider):
     img, w, h, px = provider.get_frame()
 
-    samples = []
-    for _ in range(n):
-        x, y, r, g, b = capture_entropy(px, w, h)
-        raw = px[x, y]
-        samples.append({
-            "x": x, "y": y,
-            "raw": [raw[0], raw[1], raw[2]],   # píxel crudo del frame
-            "white": [r, g, b],                # tras whitening cuántico (XOR)
+    # Crop cuadrado centrado (la "partecita" del frame).
+    side = min(w, h)
+    cx0, cy0 = (w - side) // 2, (h - side) // 2
+    cell = side / GRID
+
+    rolls, selected, seen = [], [], set()
+    n_rolls = 0
+    while len(selected) < N_SELECT and n_rolls < MAX_ROLLS:
+        n_rolls += 1
+        idx = get_quantum_random_int(num_bits=QUBITS)   # medición cuántica real (Hadamard)
+        bits = format(idx, f"0{QUBITS}b")
+        if idx >= MAX_INDEX:
+            rolls.append({"bits": bits, "index": idx, "ok": False, "reason": "fuera de rango"})
+            continue
+        if idx in seen:
+            rolls.append({"bits": bits, "index": idx, "ok": False, "reason": "repetido"})
+            continue
+        seen.add(idx)
+        rolls.append({"bits": bits, "index": idx, "ok": True, "reason": ""})
+        fila, col = idx // GRID, idx % GRID
+        sx = min(w - 1, int(cx0 + (col + 0.5) * cell))
+        sy = min(h - 1, int(cy0 + (fila + 0.5) * cell))
+        raw = px[sx, sy]
+        mask = (get_quantum_random_int(num_bits=8),
+                get_quantum_random_int(num_bits=8),
+                get_quantum_random_int(num_bits=8))
+        white = (raw[0] ^ mask[0], raw[1] ^ mask[1], raw[2] ^ mask[2])
+        selected.append({
+            "index": idx, "fila": fila, "col": col, "x": sx, "y": sy,
+            "raw": [raw[0], raw[1], raw[2]],
+            "mask": list(mask),
+            "white": list(white),
         })
 
-    # Frame para mostrar (downscale para que pese poco).
-    disp = img.copy()
-    disp.thumbnail((640, 640))
-    buf = io.BytesIO()
-    disp.save(buf, "JPEG", quality=80)
-    frame_b64 = base64.b64encode(buf.getvalue()).decode()
-
-    # Ventana de píxeles alrededor del ÚLTIMO elegido (magnificada, nearest).
-    lx, ly = samples[-1]["x"], samples[-1]["y"]
-    s = 24
-    left, top = max(0, lx - s), max(0, ly - s)
-    right, bottom = min(w, lx + s + 1), min(h, ly + s + 1)
-    crop = img.crop((left, top, right, bottom)).resize((260, 260), Image.NEAREST)
-    zbuf = io.BytesIO()
-    crop.save(zbuf, "JPEG", quality=85)
-    zoom_b64 = base64.b64encode(zbuf.getvalue()).decode()
+    disp = img.copy(); disp.thumbnail((560, 560))
+    crop = img.crop((cx0, cy0, cx0 + side, cy0 + side)).resize((420, 420), Image.NEAREST)
 
     return {
         "connected": bool(getattr(provider, "connected", True)),
-        "frame": frame_b64,
+        "frame": _b64_jpeg(disp),
         "orig_width": w, "orig_height": h,
         "disp_width": disp.width, "disp_height": disp.height,
-        "samples": samples,
-        "zoom": zoom_b64,
-        "zoom_box": {"x": left, "y": top, "w": right - left, "h": bottom - top},
+        "crop_box": {"x": cx0, "y": cy0, "w": side, "h": side},
+        "crop": _b64_jpeg(crop),
+        "grid": GRID, "n_select": N_SELECT, "qubits": QUBITS, "max_index": MAX_INDEX,
+        "rolls": rolls,
+        "selected": selected,
         "health": secure_source.health().value,
     }
 
 
-@app.get("/demo/analyze")
-def demo_analyze(n: int = 6):
-    """Frame que se está analizando + píxeles que qiskit eligió + ventana ampliada."""
+@app.get("/demo/quantum_select")
+def demo_quantum_select():
+    """Frame + crop + grilla 30×30 + 32 píxeles que eligió qiskit (Hadamard) + XOR."""
     provider = secure_source.physical._provider
     try:
-        return _analyze_provider(provider, n)
+        return _grid_select(provider)
     except Exception as e:
         return {"connected": False, "error": str(e), "health": secure_source.health().value}
+
+
+# Servir la UI estática (debe ir al final, después de las rutas de la API).
+app.mount("/ui", StaticFiles(directory=UI_DIR, html=True), name="ui")
 
 
 if __name__ == "__main__":

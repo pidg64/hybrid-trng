@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MAELSTROM · Cómo funciona</title>
+<style>
+  :root{--bg:#0b0e14;--panel:#11161f;--panel2:#0d121a;--border:#222b3a;--txt:#c9d4e3;
+    --muted:#7d8aa0;--accent:#58a6ff;--cyan:#39d4d4;--red:#ff5c5c;--green:#3fb950;--purple:#a988ff}
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 600px at 80% -10%,rgba(169,136,255,.10),transparent 60%),
+      radial-gradient(1000px 500px at -10% 110%,rgba(57,212,212,.08),transparent 55%),var(--bg)}
+  header{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px}
+  .brand{display:flex;align-items:center;gap:12px;font-weight:800;letter-spacing:.6px}
+  .logo{width:34px;height:34px;border-radius:10px;background:conic-gradient(from 0deg,#39d4d4,#58a6ff,#a020f0,#39d4d4);
+    display:grid;place-items:center;font-size:18px;box-shadow:0 0 22px rgba(88,166,255,.5);animation:spin 9s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .brand small{display:block;color:var(--muted);font-weight:500;font-size:.72rem}
+  .steps{display:flex;gap:8px;flex-wrap:wrap}
+  .steps a{color:var(--muted);text-decoration:none;font-size:.86rem;padding:8px 13px;border:1px solid var(--border);border-radius:9px;transition:.2s}
+  .steps a:hover{color:var(--txt);border-color:var(--accent);background:rgba(88,166,255,.08)}
+  .steps a.active{color:#fff;border-color:var(--cyan);background:rgba(57,212,212,.12)}
+  .steps a.egg{border-style:dashed;border-color:#ffd84d55;color:#ffd84d}
+  .toolbar{max-width:1400px;margin:0 auto;padding:18px 26px 0;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  button.go{border:1px solid var(--border);border-radius:11px;padding:11px 18px;cursor:pointer;color:#fff;font-weight:700;background:#161c27;transition:.18s}
+  button.go:hover{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+  button.go.live{border-color:var(--green);box-shadow:0 0 0 1px var(--green)}
+  .pill{font-size:.78rem;color:var(--muted);display:flex;align-items:center;gap:7px}
+  .pill b{color:var(--txt)}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--muted)}
+  .dot.on{background:var(--green);box-shadow:0 0 8px var(--green)} .dot.off{background:var(--red);box-shadow:0 0 8px var(--red)}
+  main{max-width:1400px;margin:0 auto;padding:16px 26px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+  @media (max-width:1080px){main{grid-template-columns:1fr 1fr}} @media (max-width:720px){main{grid-template-columns:1fr}}
+  .card{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--border);border-radius:16px;padding:15px;box-shadow:0 8px 30px rgba(0,0,0,.35)}
+  .card.wide{grid-column:1/-1}
+  .step{font-size:.7rem;color:var(--purple);font-weight:800;letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px}
+  .card h2{margin:0 0 3px;font-size:.95rem} .card .sub{color:var(--muted);font-size:.78rem;margin:0 0 11px;line-height:1.45}
+  .box{position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--border);background:#000}
+  .box img,.box canvas{display:block;width:100%}
+  .ph{color:var(--muted);font-size:.8rem;text-align:center;padding:28px}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:720px){.two{grid-template-columns:1fr}}
+  .rolls{font-family:ui-monospace,Menlo,monospace;font-size:.76rem;max-height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:3px}
+  .roll{display:flex;gap:8px;align-items:center;padding:3px 7px;border-radius:7px;background:#0a0f17;border:1px solid var(--border)}
+  .roll .b{color:var(--cyan);letter-spacing:1px} .roll .i{color:var(--txt);min-width:42px}
+  .roll.ok .tick{color:var(--green)} .roll.bad{opacity:.6} .roll.bad .tick{color:var(--red)}
+  .roll .why{color:var(--muted);font-size:.72rem}
+  .xor{font-family:ui-monospace,Menlo,monospace;font-size:.74rem;max-height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:5px}
+  .xrow{display:flex;align-items:center;gap:7px;padding:5px 7px;border:1px solid var(--border);border-radius:8px;background:#0a0f17;white-space:nowrap}
+  .sw{width:16px;height:16px;border-radius:4px;border:1px solid rgba(255,255,255,.15);flex:none}
+  .op{color:var(--muted)} .idx{color:var(--purple);min-width:74px;flex:none}
+  .pipe{max-width:1400px;margin:0 auto;padding:4px 26px 12px}
+  .flow{display:flex;align-items:center;gap:9px;flex-wrap:wrap;font-size:.82rem}
+  .flow b{color:var(--accent)} .flow .o{color:var(--muted)} .tag{padding:5px 10px;border:1px solid var(--border);border-radius:8px;background:#0a0f17}
+  .footnav{max-width:1400px;margin:0 auto;padding:6px 26px 40px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .footnav a{color:var(--txt);text-decoration:none;padding:12px 22px;border:1px solid var(--border);border-radius:12px;font-weight:700;transition:.18s}
+  .footnav a:hover{border-color:var(--cyan);background:rgba(57,212,212,.1)}
+  .footnav a.next{background:linear-gradient(135deg,#39d4d4,#58a6ff);color:#06121a;border:none}
+  code{background:#0a0f17;border:1px solid var(--border);padding:1px 6px;border-radius:6px;color:var(--accent)}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><div class="logo">🌀</div><div>MAELSTROM <small>cómo funciona · qué pixeles elige qiskit</small></div></div>
+  <nav class="steps">
+    <a href="index.html">Inicio</a>
+    <a href="backstage.html" class="active">① Cómo funciona</a>
+    <a href="demo.html">② Demo de ataque</a>
+    <a href="brainrot.html" class="egg">🎰</a>
+  </nav>
+</header>
+
+<div class="toolbar">
+  <button class="go" id="toggle" onclick="toggleLive()">▶ Analizar en vivo</button>
+  <span class="pill"><span class="dot" id="conn"></span><span id="conn-txt">en pausa</span></span>
+  <span class="pill">fuente: <b id="health">—</b></span>
+  <span class="pill">grilla: <b id="gridinfo">30×30 (900)</b></span>
+  <span class="pill">qiskit: <b id="qinfo">Hadamard · 10 qubits</b></span>
+  <span class="pill">elegidos: <b id="ninfo">32</b></span>
+</div>
+
+<main>
+  <section class="card">
+    <div class="step">1 · Entrada</div><h2>📷 Live feed (cámara)</h2>
+    <p class="sub">El frame lo elegimos nosotros (la cámara). qiskit NO elige el frame — elige píxeles dentro de él.</p>
+    <div class="box"><img id="feed" alt="feed" style="display:none"/><div class="ph" id="feed-ph">Cargando live feed…</div></div>
+  </section>
+
+  <section class="card">
+    <div class="step">2 · Recorte</div><h2>✂️ Frame → crop</h2>
+    <p class="sub">Tomamos una región cuadrada del frame (la "partecita") y la dividimos en una grilla 30×30 = 900 celdas.</p>
+    <div class="box"><canvas id="cFrame" width="560" height="560"></canvas><div class="ph" id="cFrame-ph">Tocá “Analizar en vivo”.</div></div>
+  </section>
+
+  <section class="card">
+    <div class="step">3 · Selección cuántica</div><h2>🎯 32 celdas que eligió qiskit</h2>
+    <p class="sub">Hadamard sobre 10 qubits → índice 0–1023. Rejection sampling: si cae ≥900 o repetido, se descarta y se vuelve a tirar.</p>
+    <div class="box"><canvas id="cGrid" width="420" height="420"></canvas><div class="ph" id="cGrid-ph">esperando…</div></div>
+  </section>
+
+  <section class="card wide">
+    <div class="two">
+      <div>
+        <div class="step">tiradas de qiskit (rejection sampling)</div>
+        <h2>🎰 Mediciones cuánticas</h2>
+        <p class="sub">Cada tirada son los 10 bits medidos → índice. En verde las aceptadas, atenuadas las descartadas.</p>
+        <div class="rolls" id="rolls"><div class="ph">—</div></div>
+      </div>
+      <div>
+        <div class="step">whitening (el shift + XOR de abajo)</div>
+        <h2>⊕ Pixel crudo XOR máscara cuántica</h2>
+        <p class="sub">Cada pixel elegido se blanquea: <code>byte_crudo ⊕ máscara_cuántica = ruido blanco</code> (anti-sesgo).</p>
+        <div class="xor" id="xor"><div class="ph">—</div></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="pipe">
+  <div class="flow">
+    <span class="tag">📷 frame</span><span class="o">→ crop →</span>
+    <span class="tag">grilla 30×30</span><span class="o">→ Hadamard(10q) →</span>
+    <span class="tag">32 índices</span><span class="o">→ pixel ⊕ máscara →</span>
+    <span class="tag">ruido blanco</span><span class="o">→</span><b>BLAKE2b(físico‖urandom)</b><span class="o">→</span><b>token 256 bits</b>
+  </div>
+</div>
+
+<div class="footnav">
+  <a href="index.html">← Inicio</a>
+  <a class="next" href="demo.html">② Ahora atacá el sistema →</a>
+</div>
+
+<script>
+  const API = location.protocol.startsWith("http") ? location.origin : "http://127.0.0.1:8000";
+  const cF = document.getElementById("cFrame"), xF = cF.getContext("2d");
+  const cG = document.getElementById("cGrid"), xG = cG.getContext("2d");
+  let live=false, timer=null;
+
+  (async function loadFeed(){
+    const img=document.getElementById("feed"), ph=document.getElementById("feed-ph");
+    try{ const {url}=await (await fetch(`${API}/feed_url`)).json();
+      if(!url){ph.textContent="No hay VIDEO_FEED_URL.";return;}
+      img.onload=()=>{img.style.display="block";ph.style.display="none";};
+      img.onerror=()=>{ph.textContent="El navegador no pudo abrir el stream (formato/red).";};
+      img.src=url;
+    }catch(e){ph.textContent="API offline en "+API;}
+  })();
+
+  function setConn(s,txt){const d=document.getElementById("conn");d.className="dot "+(s===null?"":(s?"on":"off"));document.getElementById("conn-txt").textContent=txt;}
+  function sw(rgb){return `background:rgb(${rgb[0]},${rgb[1]},${rgb[2]})`;}
+
+  function drawFrame(data){
+    const W=data.disp_width,H=data.disp_height; cF.width=W;cF.height=H;
+    const sx=W/data.orig_width, sy=H/data.orig_height, cb=data.crop_box;
+    const im=new Image(); im.onload=()=>{ xF.drawImage(im,0,0,W,H);
+      xF.strokeStyle="rgba(169,136,255,.95)"; xF.lineWidth=3;
+      xF.strokeRect(cb.x*sx,cb.y*sy,cb.w*sx,cb.h*sy);
+      xF.fillStyle="rgba(169,136,255,.9)"; xF.font="bold 13px sans-serif";
+      xF.fillText("crop "+cb.w+"×"+cb.h, cb.x*sx+6, cb.y*sy+18);
+    }; im.src="data:image/jpeg;base64,"+data.frame;
+    document.getElementById("cFrame-ph").style.display="none";
+  }
+
+  function drawGrid(data){
+    const N=data.grid, S=cG.width, cell=S/N; xG.clearRect(0,0,S,S);
+    const im=new Image(); im.onload=()=>{ xG.drawImage(im,0,0,S,S);
+      xG.strokeStyle="rgba(57,212,212,.25)"; xG.lineWidth=1;
+      for(let i=0;i<=N;i++){ xG.beginPath();xG.moveTo(i*cell,0);xG.lineTo(i*cell,S);xG.stroke();
+        xG.beginPath();xG.moveTo(0,i*cell);xG.lineTo(S,i*cell);xG.stroke(); }
+      data.selected.forEach((s,k)=>{ const last=k===data.selected.length-1;
+        xG.fillStyle = last?"rgba(57,212,212,.55)":"rgba(255,92,92,.5)";
+        xG.fillRect(s.col*cell,s.fila*cell,cell,cell);
+        xG.strokeStyle = last?"#39d4d4":"#ff5c5c"; xG.lineWidth=last?2:1;
+        xG.strokeRect(s.col*cell+.5,s.fila*cell+.5,cell-1,cell-1);
+        xG.fillStyle="#fff"; xG.font="7px monospace"; xG.textAlign="center";
+        xG.fillText(s.index, s.col*cell+cell/2, s.fila*cell+cell/2+3); xG.textAlign="left";
+      });
+    }; im.src="data:image/jpeg;base64,"+data.crop;
+    document.getElementById("cGrid-ph").style.display="none";
+  }
+
+  function drawRolls(data){
+    const box=document.getElementById("rolls"); box.innerHTML="";
+    data.rolls.forEach(r=>{ const d=document.createElement("div");
+      d.className="roll "+(r.ok?"ok":"bad");
+      d.innerHTML=`<span class="b">${r.bits}</span><span class="i">→ ${r.index}</span>
+        <span class="tick">${r.ok?"✓":"✗"}</span><span class="why">${r.reason||"aceptado"}</span>`;
+      box.appendChild(d); });
+  }
+
+  function drawXor(data){
+    const box=document.getElementById("xor"); box.innerHTML="";
+    data.selected.forEach(s=>{ const d=document.createElement("div"); d.className="xrow";
+      d.innerHTML=`<span class="idx">#${s.index} (${s.fila},${s.col})</span>
+        <span class="sw" style="${sw(s.raw)}"></span><span>${s.raw.join(',')}</span>
+        <span class="op">⊕</span><span>${s.mask.join(',')}</span>
+        <span class="op">=</span><span class="sw" style="${sw(s.white)}"></span><span>${s.white.join(',')}</span>`;
+      box.appendChild(d); });
+  }
+
+  async function tick(){
+    try{ const data=await (await fetch(`${API}/demo/quantum_select`)).json();
+      document.getElementById("health").textContent=data.health||"—";
+      if(data.connected===false){ setConn(false, data.error?"feed no disponible":"desconectado"); return; }
+      setConn(true,"EN VIVO");
+      document.getElementById("gridinfo").textContent=`${data.grid}×${data.grid} (${data.max_index})`;
+      document.getElementById("qinfo").textContent=`Hadamard · ${data.qubits} qubits`;
+      document.getElementById("ninfo").textContent=data.n_select;
+      drawFrame(data); drawGrid(data); drawRolls(data); drawXor(data);
+    }catch(e){ setConn(false,"API offline"); }
+  }
+
+  function toggleLive(){ live=!live; const b=document.getElementById("toggle");
+    if(live){ b.textContent="⏸ Pausar"; b.classList.add("live"); setConn(null,"analizando…"); tick(); timer=setInterval(tick,3500); }
+    else{ b.textContent="▶ Analizar en vivo"; b.classList.remove("live"); setConn(null,"en pausa"); clearInterval(timer); } }
+</script>
+</body>
+</html>

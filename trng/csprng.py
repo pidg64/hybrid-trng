@@ -12,7 +12,7 @@ Propiedades:
   más allá del contador explícito. Dado el seed se puede reproducir bit a bit.
 * **Forward secrecy básica:** recuperar un bloque no revela el seed (preimagen
   de la hash) ni permite retroceder a bloques anteriores.
-* Es el componente de "expansión" del modelo LavaRand: la entropía cara
+* Es el componente de "expansión" de MAELSTROM (modelo tipo Cloudflare LavaRand): la entropía cara
   (física + urandom) se mezcla en un seed y luego se estira barato con la hash.
 """
 

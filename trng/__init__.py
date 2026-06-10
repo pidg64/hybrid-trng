@@ -6,7 +6,7 @@ implementaciones intercambiables:
 
 * ``UrandomSource``  — CSPRNG del sistema operativo (fuente primaria).
 * ``PhysicalSource`` — entropía física: foto + qiskit (fuente secundaria aditiva).
-* ``HybridSource``   — mezcla criptográfica de ambas (modelo LavaRand).
+* ``HybridSource``   — mezcla criptográfica de ambas (MAELSTROM; modelo tipo Cloudflare LavaRand).
 
 El diseño permite correr la suite NIST SP 800-22 sobre cualquiera de las tres
 fuentes de forma aislada para compararlas.

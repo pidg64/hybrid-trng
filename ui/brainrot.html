@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>🎰 LAVARAND CASINO 🎰</title>
+<title>🎰 QUANTUM AI ENTROPY FR FR CASINO 🎰</title>
 <style>
   :root{ --gold:#ffd84d; --hot:#ff2e88; --cyan:#27e3ff; --lime:#aaff00; --purple:#b026ff; }
   *{box-sizing:border-box}
@@ -16,15 +16,18 @@
   }
   @keyframes bg{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
   .sparkles{position:fixed; inset:0; pointer-events:none; z-index:0}
+  .topnav{position:relative; z-index:3; display:flex; gap:8px; justify-content:center; flex-wrap:wrap; padding:12px}
+  .topnav a{color:#fff; text-decoration:none; font-size:.85rem; padding:7px 13px; border:1px solid rgba(255,216,77,.4); border-radius:9px; background:rgba(0,0,0,.3)}
+  .topnav a:hover{border-color:var(--gold); background:rgba(255,216,77,.12)}
   h1{
-    font-size:clamp(2rem,7vw,4.6rem); margin:18px 10px 2px; letter-spacing:1px;
+    font-size:clamp(1.6rem,5.5vw,3.6rem); margin:8px 10px 2px; letter-spacing:1px; position:relative; z-index:2;
     background:linear-gradient(90deg,var(--gold),var(--hot),var(--cyan),var(--lime),var(--gold));
     background-size:300%; -webkit-background-clip:text; background-clip:text; color:transparent;
     animation:shine 3s linear infinite; filter:drop-shadow(0 0 18px rgba(255,46,136,.6));
   }
   @keyframes shine{to{background-position:300%}}
-  .tagline{color:var(--gold); font-size:clamp(.9rem,2.6vw,1.25rem); margin:0 0 6px; text-shadow:0 0 10px var(--hot)}
-  .aura{font-size:1.4rem; margin:8px; color:var(--lime); text-shadow:0 0 12px var(--lime); font-weight:bold}
+  .tagline{color:var(--gold); font-size:clamp(.9rem,2.6vw,1.25rem); margin:0 0 6px; text-shadow:0 0 10px var(--hot); position:relative; z-index:2}
+  .aura{font-size:1.4rem; margin:8px; color:var(--lime); text-shadow:0 0 12px var(--lime); font-weight:bold; position:relative; z-index:2}
   .machine{
     position:relative; z-index:2; margin:14px auto; width:min(92vw,560px);
     background:linear-gradient(180deg,#2a0a4a,#12001f); border:6px solid var(--gold);
@@ -53,7 +56,7 @@
   .pop{position:fixed; z-index:5; pointer-events:none; font-size:2rem; font-weight:bold;
     animation:floaty 1.7s ease-out forwards; text-shadow:0 0 14px #000}
   @keyframes floaty{0%{opacity:0; transform:translateY(0) scale(.6)}15%{opacity:1}100%{opacity:0; transform:translateY(-180px) scale(1.5) rotate(var(--rot))}}
-  .footer{position:relative; z-index:2; max-width:620px; margin:18px auto 40px; padding:14px 18px;
+  .footer{position:relative; z-index:2; max-width:620px; margin:18px auto 60px; padding:14px 18px;
     background:rgba(0,0,0,.35); border:2px dashed var(--gold); border-radius:16px; font-size:.95rem; line-height:1.5}
   .footer b{color:var(--cyan)} .footer .red{color:var(--hot)} .footer .grn{color:var(--lime)}
   a.back{color:var(--gold); text-decoration:none; font-weight:bold}
@@ -72,7 +75,13 @@
 <body>
 <canvas class="sparkles" id="sparkles"></canvas>
 
-<h1>🎰 LAVARAND CASINO 🎰</h1>
+<nav class="topnav">
+  <a href="index.html">🏠 Inicio</a>
+  <a href="backstage.html">① Cómo funciona</a>
+  <a href="demo.html">② Demo de ataque</a>
+</nav>
+
+<h1>🎰 QUANTUM AI ENTROPY FOR REAL REAL CASINO 🎰</h1>
 <p class="tagline">la única tragamonedas con entropía CUÁNTICA fr fr 🌋 no cap</p>
 <div class="aura" id="aura">AURA: 0 ✨</div>
 
@@ -91,8 +100,8 @@
 <div class="result" id="result">tirá la palanca, rey 👑</div>
 
 <div class="footer">
-  💀 <b>dato cripto-pilled:</b> con <span class="red">random.getrandbits()</span> la casa SIEMPRE sabe tu próxima tirada (MT19537 clonable, ver <a class="back" href="demo.html">/demo</a>).
-  Acá giramos con <span class="grn">LavaRand</span> = BLAKE2b(cámara‖cuántico‖urandom) → ni la casa puede predecir. <br>
+  💀 <b>dato cripto-pilled:</b> con <span class="red">random.getrandbits()</span> la casa SIEMPRE sabe tu próxima tirada (MT19937 clonable, ver <a class="back" href="demo.html">la demo</a>).
+  Acá giramos con <span class="grn">MAELSTROM</span> = BLAKE2b(cámara‖cuántico‖urandom) → ni la casa puede predecir. <br>
   (igual perdés plata, es un casino 🤡) — <a class="back" href="demo.html">← volver a la demo seria</a>
 </div>
 
@@ -125,7 +134,6 @@
   async function pickTargets(useReal){
     if(useReal){
       try{
-        // 3 muestras de entropía REAL del pipeline (pixel cuántico + whitening)
         const out=[];
         for(let i=0;i<3;i++){
           const d=await (await fetch(`${API}/raw_entropy`)).json();
@@ -146,7 +154,6 @@
     const cyc = reels.map(r=>setInterval(()=>{ r.textContent=SYMBOLS[rnd(SYMBOLS.length)]; }, 70));
 
     const targets = await pickTargets(useReal);
-    // frenan escalonadas para dar drama
     for(let i=0;i<3;i++){
       await new Promise(res=>setTimeout(res, 550 + i*450));
       clearInterval(cyc[i]); reels[i].classList.remove("spin");
@@ -176,7 +183,6 @@
     mega.classList.add("show"); setTimeout(()=>mega.classList.remove("show"),2400);
   }
 
-  // sparkles de fondo
   const cv=document.getElementById("sparkles"), x=cv.getContext("2d");
   function size(){ cv.width=innerWidth; cv.height=innerHeight; }
   size(); addEventListener("resize",size);
