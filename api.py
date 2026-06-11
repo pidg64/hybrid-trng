@@ -24,6 +24,9 @@ from trng.physical import capture_hybrid_entropy, get_quantum_random_int
 from trng.sources import HybridSource
 from trng.frames import ENV_VIDEO_URL
 
+# PQC: ML-KEM-768 (FIPS 203) en puro Python, sembrado con entropía de MAELSTROM.
+from kyber_py.ml_kem import ML_KEM_768
+
 app = FastAPI(title="MAELSTROM API")
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -162,6 +165,11 @@ def page_demo():
 @app.get("/brainrot")
 def page_brainrot():
     return RedirectResponse("/ui/brainrot.html")
+
+
+@app.get("/pqc")
+def page_pqc():
+    return RedirectResponse("/ui/pqc.html")
 
 
 @app.get("/feed_url")
@@ -367,6 +375,40 @@ def demo_quantum_select():
         return _grid_select(provider)
     except Exception as e:
         return {"connected": False, "error": str(e), "health": secure_source.health().value}
+
+
+# ============================================================================
+#  PQC  —  ML-KEM-768 (FIPS 203) sembrado con entropía de MAELSTROM
+# ============================================================================
+#  Punto clave: PQC arregla el ALGORITMO (resistente a Shor), pero igual necesita
+#  un RNG fuerte para generar las claves. Acá la clave nace de los bytes de
+#  MAELSTROM: seed (64B) -> _keygen_internal(d, z); después un round-trip
+#  encaps/decaps prueba que el shared secret coincide en ambos lados.
+
+def _pqc_handshake(seed64: bytes, m32: bytes):
+    d, z = seed64[:32], seed64[32:64]
+    ek, dk = ML_KEM_768._keygen_internal(d, z)            # clave pública + privada
+    ss_send, ct = ML_KEM_768._encaps_internal(ek, m32)    # emisor: secreto + ciphertext
+    ss_recv = ML_KEM_768.decaps(dk, ct)                   # receptor recupera el secreto
+    return {
+        "algo": "ML-KEM-768 (NIST FIPS 203)",
+        "seed_hex": seed64.hex(),
+        "ek_hex": ek.hex(), "ek_size": len(ek),
+        "dk_size": len(dk),
+        "ct_hex": ct.hex(), "ct_size": len(ct),
+        "ss_send": ss_send.hex(), "ss_recv": ss_recv.hex(), "ss_size": len(ss_send),
+        "match": ss_send == ss_recv,
+    }
+
+
+@app.get("/demo/pqc_keygen")
+def demo_pqc_keygen():
+    """Genera un par ML-KEM-768 sembrado por MAELSTROM y prueba un encaps/decaps."""
+    seed = secure_source.get_bytes(64)   # entropía MAELSTROM -> seed de keygen (d||z)
+    m = secure_source.get_bytes(32)      # entropía MAELSTROM -> randomness de encaps
+    data = _pqc_handshake(seed, m)
+    data["health"] = secure_source.health().value
+    return data
 
 
 # Servir la UI estática (debe ir al final, después de las rutas de la API).

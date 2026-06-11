@@ -10,3 +10,4 @@ nistrng
 matplotlib
 scipy
 opencv-python
+kyber-py
