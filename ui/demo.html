@@ -23,38 +23,78 @@
   .steps a:hover{color:var(--txt);border-color:var(--accent);background:rgba(88,166,255,.08)}
   .steps a.active{color:#fff;border-color:var(--cyan);background:rgba(57,212,212,.12)}
   .steps a.egg{border-style:dashed;border-color:#ffd84d55;color:#ffd84d}
-  main{max-width:1320px;margin:0 auto;padding:24px;display:grid;grid-template-columns:minmax(360px,1fr) minmax(420px,1.25fr);gap:22px}
-  @media (max-width:920px){main{grid-template-columns:1fr}}
+  main{max-width:1320px;margin:0 auto;padding:24px}
   .card{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--border);border-radius:16px;padding:18px;box-shadow:0 8px 30px rgba(0,0,0,.35)}
-  .card h2{margin:2px 0 4px;font-size:1.02rem} .card .sub{color:var(--muted);font-size:.82rem;margin:0 0 14px}
+  .card h2{margin:2px 0 4px;font-size:1.05rem} .card .sub{color:var(--muted);font-size:.84rem;margin:0 0 14px}
+
+  .top{display:grid;grid-template-columns:minmax(320px,1fr) minmax(380px,1.1fr);gap:18px;margin-bottom:18px}
+  @media (max-width:880px){.top{grid-template-columns:1fr}}
+
+  /* live feed */
   .feed-wrap{position:relative;border-radius:12px;overflow:hidden;background:#000;aspect-ratio:16/9;display:grid;place-items:center;border:1px solid var(--border)}
-  .feed-wrap img{width:100%;height:100%;object-fit:cover;display:block}
+  .feed-wrap img,.feed-wrap video{width:100%;height:100%;object-fit:cover;display:block}
   .feed-ph{color:var(--muted);font-size:.85rem;text-align:center;padding:24px}
   .chip{position:absolute;top:10px;left:10px;display:flex;align-items:center;gap:7px;background:rgba(0,0,0,.55);border:1px solid var(--border);padding:5px 11px;border-radius:999px;font-size:.74rem}
   .dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)} .dot.off{background:var(--red);box-shadow:0 0 8px var(--red)}
   .legend{margin-top:14px;font-size:.8rem;color:var(--muted);line-height:1.55}
-  .btns{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+
+  .btns{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:4px}
   button.attack{border:1px solid var(--border);border-radius:12px;padding:15px 14px;cursor:pointer;color:#fff;font-weight:700;font-size:.92rem;text-align:left;background:#161c27;transition:.18s;line-height:1.25}
   button.attack span{display:block;font-weight:500;font-size:.74rem;color:var(--muted);margin-top:3px}
   button.vuln:hover{border-color:var(--red);box-shadow:0 0 0 1px var(--red),0 8px 24px rgba(255,92,92,.25);transform:translateY(-1px)}
   button.safe:hover{border-color:var(--green);box-shadow:0 0 0 1px var(--green),0 8px 24px rgba(63,185,80,.22);transform:translateY(-1px)}
   button:disabled{opacity:.5;cursor:not-allowed;transform:none!important;box-shadow:none!important}
-  .term{background:#070a0f;border:1px solid var(--border);border-radius:12px;height:430px;overflow-y:auto;padding:14px 16px;font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:.82rem;line-height:1.55}
-  .term::-webkit-scrollbar{width:9px} .term::-webkit-scrollbar-thumb{background:#1d2737;border-radius:9px}
-  .ln{white-space:pre-wrap;word-break:break-word;animation:fade .25s ease}
-  @keyframes fade{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
-  .l-title{color:#fff;font-weight:700;margin-top:6px} .l-phase{color:var(--cyan);font-weight:700;margin-top:8px}
-  .l-info{color:var(--txt)} .l-dim{color:var(--muted)} .l-warn{color:var(--yellow)} .l-crit{color:var(--red);font-weight:700} .l-good{color:var(--green);font-weight:700}
-  .banner{margin:0 0 14px;border-radius:12px;padding:14px 16px;font-weight:700;display:none;align-items:center;gap:12px;font-size:1rem}
+
+  .stage{display:grid;grid-template-columns:1.1fr .9fr;gap:18px}
+  @media (max-width:960px){.stage{grid-template-columns:1fr}}
+
+  /* phase rail */
+  .rail{display:flex;gap:6px;margin-bottom:14px}
+  .rail .p{flex:1;text-align:center;font-size:.68rem;color:var(--muted);padding:7px 4px;border:1px solid var(--border);border-radius:8px;transition:.25s;letter-spacing:.3px}
+  .rail .p b{display:block;font-size:.82rem;color:var(--txt);margin-bottom:2px}
+  .rail .p.on{border-color:var(--cyan);color:#fff;background:rgba(57,212,212,.12);box-shadow:0 0 16px rgba(57,212,212,.25)}
+  .rail .p.done{border-color:var(--accent)}
+
+  /* state grid */
+  .gridwrap{border:1px solid var(--border);border-radius:12px;padding:14px;background:#070a0f}
+  .gridhead{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;font-size:.78rem;color:var(--muted)}
+  .gridhead b{color:var(--txt);font-size:.92rem;font-family:ui-monospace,Menlo,monospace}
+  #grid{display:grid;grid-template-columns:repeat(26,1fr);gap:3px}
+  .cell{aspect-ratio:1;border-radius:2px;background:#141b27;transition:background .18s,box-shadow .18s,transform .18s}
+  .cell.lit{background:var(--accent);box-shadow:0 0 6px rgba(88,166,255,.8)}
+  .cell.lit.sec{background:var(--cyan);box-shadow:0 0 6px rgba(57,212,212,.7)}
+  .gridwrap.locked{animation:snap .5s ease}
+  @keyframes snap{40%{transform:scale(.985)}100%{transform:scale(1)}}
+  .gridwrap.locked .cell.lit{background:var(--red);box-shadow:0 0 5px rgba(255,92,92,.6)}
+  .gridwrap.locked.mit .cell.lit{background:var(--green);box-shadow:0 0 5px rgba(63,185,80,.55)}
+
+  /* token convergence */
+  .conv{border:1px solid var(--border);border-radius:12px;padding:14px;background:#070a0f}
+  .tok{margin-bottom:14px}
+  .tok .lbl{font-size:.72rem;color:var(--muted);margin-bottom:5px;display:flex;justify-content:space-between}
+  .hex{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.84rem;line-height:1.7;letter-spacing:1px;word-break:break-all;min-height:48px}
+  .nib{opacity:.18;transition:opacity .12s,color .12s,text-shadow .12s}
+  .nib.show{opacity:1}
+  .nib.match{color:var(--green);text-shadow:0 0 8px rgba(63,185,80,.6)}
+  .nib.diff{color:var(--red);text-shadow:0 0 8px rgba(255,92,92,.6)}
+  .nib.pred{color:var(--accent)}
+  .banner{margin:16px 0 0;border-radius:12px;padding:14px 16px;font-weight:700;display:none;align-items:center;gap:12px;font-size:1.02rem}
   .banner.pwned{display:flex;background:rgba(255,92,92,.12);border:1px solid var(--red);color:#ffb3b3}
   .banner.safe{display:flex;background:rgba(63,185,80,.12);border:1px solid var(--green);color:#a7e9b1}
   .banner .big{font-size:1.5rem}
-  .hint{color:var(--muted);font-size:.74rem;margin-top:10px}
+
+  details{margin-top:14px;border:1px solid var(--border);border-radius:10px;background:#070a0f}
+  summary{cursor:pointer;padding:10px 14px;font-size:.8rem;color:var(--muted)}
+  .term{max-height:180px;overflow-y:auto;padding:0 16px 12px;font-family:ui-monospace,Menlo,monospace;font-size:.78rem;line-height:1.5}
+  .ln{white-space:pre-wrap;word-break:break-word}
+  .l-title{color:#fff;font-weight:700} .l-phase{color:var(--cyan);font-weight:700} .l-info{color:var(--txt)}
+  .l-dim{color:var(--muted)} .l-warn{color:var(--yellow)} .l-crit{color:var(--red);font-weight:700} .l-good{color:var(--green);font-weight:700}
+  .note{color:var(--muted);font-size:.72rem;margin-top:10px}
+  code{background:#0a0f17;border:1px solid var(--border);padding:1px 6px;border-radius:6px;color:var(--accent)}
   .footnav{max-width:1320px;margin:0 auto;padding:6px 24px 40px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
   .footnav a{color:var(--txt);text-decoration:none;padding:12px 22px;border:1px solid var(--border);border-radius:12px;font-weight:700;transition:.18s}
   .footnav a:hover{border-color:var(--cyan);background:rgba(57,212,212,.1)}
   .footnav a.next{background:linear-gradient(135deg,#ffd84d,#ff9d00);color:#1b0033;border:none}
-  code{background:#0a0f17;border:1px solid var(--border);padding:1px 6px;border-radius:6px;color:var(--accent)}
 </style>
 </head>
 <body>
@@ -70,35 +110,69 @@
 </header>
 
 <main>
-  <section class="card">
-    <h2>📷 Physical entropy source</h2>
-    <p class="sub">Live camera feed. Every secure token is born, in part, from this real-world chaos.</p>
-    <div class="feed-wrap">
-      <div class="chip"><span class="dot" id="feed-dot"></span><span id="feed-status">connecting…</span></div>
-      <img id="feed" alt="live feed" style="display:none" />
-      <div class="feed-ph" id="feed-ph">Loading live feed…</div>
-    </div>
-    <div class="legend">
-      🔓 <b>Vulnerable endpoint</b>: generates the token with <code>random.getrandbits()</code> (Mersenne Twister, predictable).<br>
-      🛡️ <b>Secure endpoint</b>: generates it with <b>MAELSTROM</b> = BLAKE2b(camera ‖ quantum ‖ urandom).<br>
-      The attacker does the same against both. Watch the console →
-    </div>
-  </section>
+  <div class="top">
+    <section class="card">
+      <h2>📷 Physical entropy source</h2>
+      <p class="sub">Live webcam feed. Every secure token is born, in part, from this real-world chaos.</p>
+      <div class="feed-wrap">
+        <div class="chip"><span class="dot" id="feed-dot"></span><span id="feed-status">connecting…</span></div>
+        <video id="feed" autoplay muted playsinline style="display:none"></video>
+        <div class="feed-ph" id="feed-ph">Requesting webcam…</div>
+      </div>
+      <div class="legend">
+        🔓 <b>Vulnerable endpoint</b>: generates the token with <code>random.getrandbits()</code> (Mersenne Twister, predictable).<br>
+        🛡️ <b>Secure endpoint</b>: generates it with <b>MAELSTROM</b> = BLAKE2b(camera ‖ quantum ‖ urandom).<br>
+        The attacker does the same against both. Watch the state lock in →
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>🎯 Token prediction attack</h2>
+      <p class="sub">The attacker collects 78 public reset tokens (624 × 32-bit outputs) — exactly enough to clone a Mersenne&nbsp;Twister and predict <code>admin</code>'s next token.</p>
+      <div class="btns">
+        <button class="attack vuln" id="btn-vuln" onclick="runAttack('vulnerable')">
+          🔓 Attack the VULNERABLE endpoint<span>random.getrandbits → Mersenne Twister</span>
+        </button>
+        <button class="attack safe" id="btn-safe" onclick="runAttack('secure')">
+          🛡️ Attack the SECURE endpoint<span>MAELSTROM (camera + quantum + urandom)</span>
+        </button>
+      </div>
+    </section>
+  </div>
 
   <section class="card">
-    <h2>🎯 Token prediction attack</h2>
-    <p class="sub">The attacker collects public tokens, clones the generator and predicts <code>admin</code>'s reset.</p>
-    <div class="btns">
-      <button class="attack vuln" id="btn-vuln" onclick="runAttack('vulnerable')">
-        🔓 Attack the VULNERABLE endpoint<span>random.getrandbits → Mersenne Twister</span>
-      </button>
-      <button class="attack safe" id="btn-safe" onclick="runAttack('secure')">
-        🛡️ Attack the SECURE endpoint<span>MAELSTROM (camera + quantum + urandom)</span>
-      </button>
+    <div class="rail">
+      <div class="p" data-p="1"><b>1</b>Collection</div>
+      <div class="p" data-p="2"><b>2</b>Reconstruct</div>
+      <div class="p" data-p="3"><b>3</b>Predict</div>
+      <div class="p" data-p="4"><b>4</b>Takeover</div>
     </div>
+
+    <div class="stage">
+      <div class="gridwrap" id="gridwrap">
+        <div class="gridhead"><span>RNG output captured</span><b id="grid-count">0 / 624</b></div>
+        <div id="grid"></div>
+      </div>
+
+      <div class="conv">
+        <div class="tok">
+          <div class="lbl"><span>🔮 PREDICTED token (attacker's guess)</span></div>
+          <div class="hex" id="hex-pred"></div>
+        </div>
+        <div class="tok">
+          <div class="lbl"><span>🎟️ REAL admin reset token</span></div>
+          <div class="hex" id="hex-real"></div>
+        </div>
+      </div>
+    </div>
+
     <div class="banner" id="banner"></div>
-    <div class="term" id="term"></div>
-    <div class="hint">The attack really runs in the backend (RandCrack on the Mersenne Twister). Each run resets <code>admin</code> so you can repeat it.</div>
+
+    <details>
+      <summary>▾ Raw backend event log (the attack really runs server-side · RandCrack on MT19937)</summary>
+      <div class="term" id="term"></div>
+    </details>
+    <p class="note">Phase progression &amp; the PWNED/MITIGATED verdict come straight from the live backend stream. The 256-bit hex reels are illustrative (the server only streams a truncated token), but match/diverge follows the real result.</p>
   </section>
 </main>
 
@@ -110,36 +184,129 @@
 <script>
   const API = location.protocol.startsWith("http") ? location.origin : "http://127.0.0.1:8000";
   const term=document.getElementById("term"), banner=document.getElementById("banner");
+  const gridEl=document.getElementById("grid"), gridwrap=document.getElementById("gridwrap"), gridCount=document.getElementById("grid-count");
+  const hexPred=document.getElementById("hex-pred"), hexReal=document.getElementById("hex-real");
+  const rail=[...document.querySelectorAll(".rail .p")];
   let running=false;
 
+  // live webcam feed (browser getUserMedia — needs https or http://127.0.0.1)
   (async function loadFeed(){
-    const dot=document.getElementById("feed-dot"),status=document.getElementById("feed-status"),img=document.getElementById("feed"),ph=document.getElementById("feed-ph");
-    try{ const {url}=await (await fetch(`${API}/feed_url`)).json();
-      if(!url){status.textContent="no feed URL";dot.classList.add("off");ph.textContent="No VIDEO_FEED_URL set.";return;}
-      img.onload=()=>{img.style.display="block";ph.style.display="none";dot.classList.remove("off");status.textContent="LIVE";};
-      img.onerror=()=>{dot.classList.add("off");status.textContent="feed unavailable";ph.textContent="The browser couldn't open the stream. The attack works anyway.";};
-      img.src=url;
-    }catch(e){dot.classList.add("off");status.textContent="API offline";ph.textContent="Couldn't reach the API at "+API;}
+    const dot=document.getElementById("feed-dot"),status=document.getElementById("feed-status"),video=document.getElementById("feed"),ph=document.getElementById("feed-ph");
+    if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
+      dot.classList.add("off");status.textContent="no webcam API";
+      ph.textContent="This browser can't access the webcam (needs https or http://127.0.0.1). The attack works anyway.";return;
+    }
+    try{
+      // prefer the Logitech C920 if present; labels are only exposed after permission is granted
+      let stream=await navigator.mediaDevices.getUserMedia({video:true,audio:false});
+      const cams=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==="videoinput");
+      const c920=cams.find(d=>/c920|logitech|hd pro webcam/i.test(d.label));
+      let label="webcam";
+      if(c920 && stream.getVideoTracks()[0]?.label!==c920.label){
+        stream.getTracks().forEach(t=>t.stop());
+        stream=await navigator.mediaDevices.getUserMedia({video:{deviceId:{exact:c920.deviceId}},audio:false});
+      }
+      const active=stream.getVideoTracks()[0]?.label||"";
+      if(/c920|logitech|hd pro webcam/i.test(active))label="C920";
+      video.srcObject=stream;
+      video.onloadedmetadata=()=>{video.style.display="block";ph.style.display="none";dot.classList.remove("off");status.textContent="LIVE · "+label;};
+    }catch(e){
+      dot.classList.add("off");
+      status.textContent=(e&&e.name==="NotAllowedError")?"permission denied":"webcam unavailable";
+      ph.textContent=(e&&e.name==="NotAllowedError")
+        ? "Camera permission was blocked. Allow it in the browser and reload. The attack works anyway."
+        : "Couldn't open the webcam ("+(e&&e.name||e)+"). The attack works anyway.";
+    }
   })();
 
-  function log(level,msg){const d=document.createElement("div");d.className="ln l-"+level;d.textContent=msg;term.appendChild(d);term.scrollTop=term.scrollHeight;}
-  function showBanner(s){ if(s){banner.className="banner pwned";banner.innerHTML='<span class="big">🔓</span> PWNED — admin account hijacked with a predicted token.';}
-    else{banner.className="banner safe";banner.innerHTML='<span class="big">🛡️</span> MITIGATED — hybrid entropy can\'t be predicted.';} }
+  // build 624 cells
+  for(let i=0;i<624;i++){const c=document.createElement("div");c.className="cell";gridEl.appendChild(c);}
+  const cells=[...gridEl.children];
 
-  async function runAttack(target){
-    if(running)return; running=true; term.innerHTML=""; banner.style.display="none"; banner.className="banner";
+  function log(level,msg){const d=document.createElement("div");d.className="ln l-"+level;d.textContent=msg;term.appendChild(d);term.scrollTop=term.scrollHeight;}
+  const rnd=n=>"0123456789abcdef"[Math.floor(Math.random()*16)];
+  const randHex=n=>Array.from({length:n},rnd).join("");
+
+  function setPhase(n){rail.forEach((p,i)=>{p.classList.toggle("on",i===n-1);p.classList.toggle("done",i<n-1);});}
+
+  // smooth grid fill toward a target count
+  let target=0, filled=0, secure=false, raf=null;
+  function pump(){
+    if(filled<target){
+      const step=Math.max(1,Math.ceil((target-filled)/6));
+      for(let k=0;k<step&&filled<target;k++){const c=cells[filled++];c.classList.add("lit");if(secure)c.classList.add("sec");}
+      gridCount.textContent=filled+" / 624";
+      raf=requestAnimationFrame(pump);
+    }else raf=null;
+  }
+  function fillTo(n){target=Math.min(624,n);if(!raf)raf=pump();}
+
+  function resetUI(sec){
+    secure=sec; target=0; filled=0; if(raf){cancelAnimationFrame(raf);raf=null;}
+    cells.forEach(c=>c.className="cell");
+    gridwrap.className="gridwrap"; gridCount.textContent="0 / 624";
+    hexPred.innerHTML=""; hexReal.innerHTML="";
+    banner.style.display="none"; banner.className="banner"; term.innerHTML="";
+    setPhase(1);
+  }
+
+  function lockGrid(mit){gridwrap.classList.add("locked");if(mit)gridwrap.classList.add("mit");}
+
+  // reveal 64 hex nibbles of predicted, then real, then compare
+  function buildHex(el,str){
+    el.innerHTML="";
+    return [...str].map(ch=>{const s=document.createElement("span");s.className="nib";s.textContent=ch;el.appendChild(s);return s;});
+  }
+  function revealConvergence(success){
+    const real=randHex(64);
+    const pred = success ? real : real.split("").map(c=>Math.random()<.85?rnd():c).join("");
+    const ps=buildHex(hexPred,pred), rs=buildHex(hexReal,real);
+    let i=0;
+    const iv=setInterval(()=>{
+      if(i>=64){clearInterval(iv);return;}
+      ps[i].classList.add("show","pred"); rs[i].classList.add("show");
+      const same=pred[i]===real[i];
+      ps[i].classList.remove("pred"); ps[i].classList.add(same?"match":"diff");
+      rs[i].classList.add(same?"match":"diff");
+      i++;
+    },34);
+  }
+
+  function showBanner(s){
+    if(s){banner.className="banner pwned";banner.innerHTML='<span class="big">🔓</span> PWNED — admin account hijacked with a predicted token.';}
+    else{banner.className="banner safe";banner.innerHTML='<span class="big">🛡️</span> MITIGATED — hybrid entropy can\'t be predicted.';}
+  }
+
+  function handle(ev){
+    const m=ev.msg||"";
+    if(ev.level!=="done") log(ev.level,m);
+    if(m.includes("PHASE 1")) setPhase(1);
+    else if(m.includes("PHASE 2")){setPhase(2);fillTo(624);lockGrid(secure);}
+    else if(m.includes("PHASE 3")) setPhase(3);
+    else if(m.includes("PHASE 4")){setPhase(4);}
+    // collection progress
+    const col=m.match(/collected (\d+)\/78/);
+    if(col) fillTo(parseInt(col[1],10)*8);
+    if(ev.level==="done"){
+      revealConvergence(!!ev.success);
+      showBanner(!!ev.success);
+      if(!ev.success) lockGrid(true);
+    }
+  }
+
+  async function runAttack(targetEp){
+    if(running)return; running=true; resetUI(targetEp==="secure");
     document.getElementById("btn-vuln").disabled=true; document.getElementById("btn-safe").disabled=true;
     try{
-      const resp=await fetch(`${API}/demo/attack?target=${target}`);
+      const resp=await fetch(`${API}/demo/attack?target=${targetEp}`);
       if(!resp.ok||!resp.body)throw new Error("HTTP "+resp.status);
       const reader=resp.body.getReader(), dec=new TextDecoder(); let buf="";
-      while(true){ const {value,done}=await reader.read(); if(done)break;
+      while(true){const {value,done}=await reader.read(); if(done)break;
         buf+=dec.decode(value,{stream:true}); let i;
-        while((i=buf.indexOf("\n"))>=0){ const line=buf.slice(0,i).trim(); buf=buf.slice(i+1);
-          if(!line)continue; const ev=JSON.parse(line);
-          if(ev.level==="done")showBanner(ev.success); else log(ev.level,ev.msg); } }
-    }catch(e){ log("crit","✗ API connection error: "+e.message); log("dim","Is  python api.py  running at "+API+" ?"); }
-    finally{ running=false; document.getElementById("btn-vuln").disabled=false; document.getElementById("btn-safe").disabled=false; }
+        while((i=buf.indexOf("\n"))>=0){const line=buf.slice(0,i).trim(); buf=buf.slice(i+1);
+          if(!line)continue; handle(JSON.parse(line));}}
+    }catch(e){log("crit","✗ API connection error: "+e.message);log("dim","Is  python api.py  running at "+API+" ?");}
+    finally{running=false;document.getElementById("btn-vuln").disabled=false;document.getElementById("btn-safe").disabled=false;}
   }
 </script>
 </body>
