@@ -15,7 +15,7 @@
   header{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px}
   .brand{display:flex;align-items:center;gap:12px;font-weight:800;letter-spacing:.6px}
   .logo{width:34px;height:34px;border-radius:10px;background:conic-gradient(from 0deg,#39d4d4,#58a6ff,#a020f0,#39d4d4);
-    display:grid;place-items:center;font-size:18px;box-shadow:0 0 22px rgba(88,166,255,.5);animation:spin 9s linear infinite}
+    display:grid;place-items:center;font-size:18px;animation:spin 9s linear infinite}
   @keyframes spin{to{transform:rotate(360deg)}}
   .brand small{display:block;color:var(--muted);font-weight:500;font-size:.72rem}
   .steps{display:flex;gap:8px;flex-wrap:wrap}
@@ -37,7 +37,7 @@
   .hero p{color:var(--muted);font-size:1.05rem;margin:12px auto 0;max-width:620px}
   .hero p b{color:var(--txt)}
   main{max-width:1100px;margin:0 auto;padding:24px 26px}
-  .sec{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--border);border-radius:18px;padding:22px;margin-bottom:20px;box-shadow:0 8px 30px rgba(0,0,0,.35)}
+  .sec{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--border);border-radius:18px;padding:22px;margin-bottom:20px;box-shadow:0 2px 10px rgba(0,0,0,.15)}
   .cap{text-align:center;color:var(--muted);font-size:.82rem;margin:4px 0 0}
   .h{text-align:center;font-size:.74rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--purple);margin:0 0 16px}
   /* llaves forjándose */
@@ -116,108 +116,83 @@
   </nav>
 </header>
 
+<main>
+  <!-- llaves forjándose -->
+  <!DOCTYPE html>
+<html lang="en">
+
+
 <section class="hero">
-  <div class="wip">🚧 BUILDING IN PROGRESS <b>v0.1</b></div>
-  <h1>PQC&nbsp;MIGRATOR</h1>
+<h1>PQC&nbsp;MIGRATOR</h1>
   <p><b>Today</b> we forge the keys. <b>Tomorrow</b> we automate your whole post-quantum migration.</p>
 </section>
 
 <main>
   <!-- llaves forjándose -->
-  <section class="sec">
-    <p class="h">🔑 forging quantum-safe keys</p>
-    <div class="forge-row">
-      <div class="forge" style="animation-delay:0s">   <div class="ic">🔑</div><div class="bar"><i style="animation-delay:0s"></i></div><div class="lab"><span class="t1">forging…</span><span class="t2">🔒 secured</span></div></div>
-      <div class="forge" style="animation-delay:.5s"> <div class="ic">🔑</div><div class="bar"><i style="animation-delay:.5s"></i></div><div class="lab"><span class="t1">forging…</span><span class="t2">🔒 secured</span></div></div>
-      <div class="forge" style="animation-delay:1s">  <div class="ic">🔑</div><div class="bar"><i style="animation-delay:1s"></i></div><div class="lab"><span class="t1">forging…</span><span class="t2">🔒 secured</span></div></div>
-      <div class="forge" style="animation-delay:1.5s"><div class="ic">🔑</div><div class="bar"><i style="animation-delay:1.5s"></i></div><div class="lab"><span class="t1">forging…</span><span class="t2">🔒 secured</span></div></div>
-      <div class="forge" style="animation-delay:2s">  <div class="ic">🔑</div><div class="bar"><i style="animation-delay:2s"></i></div><div class="lab"><span class="t1">forging…</span><span class="t2">🔒 secured</span></div></div>
-    </div>
-    <p class="cap">every key born from quantum-inspired entropy → whitened → mixed (BLAKE2b) → quantum-safe</p>
-  </section>
+<section class="sec">
+  <p class="h">🔑 forging quantum-safe keys</p>
 
-  <!-- por qué (2x2 mini) -->
-  <section class="sec">
-    <p class="h">why you need this</p>
-    <div class="mini2">
-      <div class="mc red"><span class="e">💀</span>weak RNG × classical<small>broken now &amp; later</small></div>
-      <div class="mc red"><span class="e">💀</span>weak RNG × PQC<small>still broken — the trap</small></div>
-      <div class="mc amber"><span class="e">⚠️</span>MAELSTROM × classical<small>safe now, Shor later</small></div>
-      <div class="mc green"><span class="e">✅</span>MAELSTROM × PQC<small>safe now &amp; post-quantum</small></div>
-    </div>
-    <p class="cap">a quantum-safe algorithm on a weak RNG is still broken — you need <b style="color:var(--green)">both</b></p>
-  </section>
+  <div class="forge-row" style="display:flex;align-items:center;justify-content:center;gap:36px;margin:10px 0 24px">
+    <div style="text-align:center"><div style="font-size:4.5rem">🔑</div></div>
 
-  <!-- roadmap -->
-  <section class="sec">
-    <p class="h">the migration, automated</p>
-    <div class="road">
-      <div class="rstep done"><div class="ric">🌀</div><div class="rl">Entropy engine</div><div class="rb">LIVE</div></div>
-      <div class="arr">→</div>
-      <div class="rstep done"><div class="ric">🔑</div><div class="rl">PQC keygen</div><div class="rb">LIVE</div></div>
-      <div class="arr">→</div>
-      <div class="rstep soon"><div class="ric">🔍</div><div class="rl">Stack scanner</div><div class="rb">SOON</div></div>
-      <div class="arr">→</div>
-      <div class="rstep soon"><div class="ric">🔄</div><div class="rl">Auto-swap</div><div class="rb">SOON</div></div>
-      <div class="arr">→</div>
-      <div class="rstep soon"><div class="ric">🛡️</div><div class="rl">Fully migrated</div><div class="rb">SOON</div></div>
-    </div>
-    <p class="cap">we built the foundation (green). the rest plugs on top — that's the accelerator.</p>
-  </section>
+    <svg width="260" height="80" viewBox="0 0 260 80" style="overflow:visible">
+      <path id="curve" d="M 10 60 Q 130 -40 250 60" fill="none" stroke="#222b3a" stroke-width="2" stroke-dasharray="6 6"/>
+      <circle r="5" fill="#58a6ff">
+        <animateMotion dur="2s" repeatCount="indefinite" path="M 10 60 Q 130 -40 250 60" />
+      </circle>
+    </svg>
 
-  <!-- el motor que ya funciona -->
-  <section class="sec">
-    <p class="h">✅ the engine already runs — try it</p>
-    <button class="kbtn" id="kbtn" onclick="genKey()">🔑 Forge an ML-KEM-768 keypair from MAELSTROM</button>
-    <div class="kstatus" id="kstatus"></div>
+    <div style="text-align:center"><div style="font-size:4.5rem">🔒</div></div>
+  </div>
 
-    <div class="pipe" id="pipe" style="display:none">
-      <div class="node"><div class="lbl">1 · MAELSTROM seed</div><div class="big">🌀 64 B</div><div class="hex" id="n-seed"></div><div class="sz">camera + quantum + urandom</div></div>
-      <div class="node"><div class="lbl">2 · keygen</div><div class="big" id="n-algo">🔑 ML-KEM-768</div><div class="hex" id="n-ek"></div><div class="sz" id="n-keysz"></div></div>
-      <div class="node"><div class="lbl">3 · encapsulate</div><div class="big">📦 ciphertext</div><div class="hex" id="n-ct"></div><div class="sz" id="n-ctsz"></div></div>
-      <div class="node"><div class="lbl">4 · decapsulate</div><div class="big">🔓 recover</div><div class="hex">decaps(dk, ct)</div><div class="sz">private key never sent</div></div>
-    </div>
-
-    <div class="ss" id="ssbox" style="display:none">
-      <div class="ssbox"><div class="lbl">🔒 shared secret — sender</div><div class="hex" id="ss-send"></div></div>
-      <div class="ssbox"><div class="lbl">🔓 shared secret — receiver</div><div class="hex" id="ss-recv"></div></div>
-    </div>
-
-    <div class="kbanner" id="kbanner"></div>
-  </section>
-</main>
-
-<div class="footnav">
-  <a href="demo.html">← Attack demo</a>
-  <a class="next" href="brainrot.html">🎰 Casino (easter egg) →</a>
+<div style="max-width:520px;margin:10px auto">
+  <div style="display:flex;justify-content:space-between;color:var(--muted);font-size:.82rem;margin-bottom:8px">
+    <span>Building quantum-safe protection</span>
+    <span id="pct">0%</span>
+  </div>
+  <div style="height:12px;background:#1a1f28;border-radius:999px;overflow:hidden;border:1px solid var(--border)">
+    <div id="progressFill" style="height:100%;width:0%;background:repeating-linear-gradient(90deg,#e3b341,#e3b341 8px,#b58f33 8px,#b58f33 16px);transition:width 0.5s ease-out"></div>
+  </div>
 </div>
 
 <script>
-  const API = location.protocol.startsWith("http") ? location.origin : "http://127.0.0.1:8000";
-  const short = (h, head=22, tail=10) => h.length<=head+tail ? h : `${h.slice(0,head)} … ${h.slice(-tail)}`;
-
-  async function genKey(){
-    const btn=document.getElementById("kbtn"), st=document.getElementById("kstatus"), banner=document.getElementById("kbanner");
-    btn.disabled=true; banner.style.display="none"; banner.className="kbanner";
-    st.textContent="Pulling entropy from MAELSTROM and running ML-KEM-768…";
-    try{
-      const d = await (await fetch(`${API}/demo/pqc_keygen`)).json();
-      document.getElementById("pipe").style.display="grid";
-      document.getElementById("ssbox").style.display="grid";
-      document.getElementById("n-seed").textContent = short(d.seed_hex);
-      document.getElementById("n-algo").textContent = "🔑 "+d.algo;
-      document.getElementById("n-ek").textContent = short(d.ek_hex);
-      document.getElementById("n-keysz").textContent = `pub ${d.ek_size} B · sec ${d.dk_size} B`;
-      document.getElementById("n-ct").textContent = short(d.ct_hex);
-      document.getElementById("n-ctsz").textContent = `ct ${d.ct_size} B`;
-      document.getElementById("ss-send").textContent = d.ss_send;
-      document.getElementById("ss-recv").textContent = d.ss_recv;
-      if(d.match){ banner.className="kbanner ok"; banner.innerHTML=`<span class="big">✅</span> Shared secrets match — quantum-safe channel established, seeded by MAELSTROM (source: ${d.health}).`; }
-      else{ banner.className="kbanner bad"; banner.innerHTML=`<span class="big">❌</span> Shared secrets differ — handshake failed.`; }
-      st.textContent="";
-    }catch(e){ st.textContent="✗ Couldn't reach the API at "+API+". Is  python api.py  running?"; }
-    finally{ btn.disabled=false; }
-  }
+(function(){
+  const fill = document.getElementById('progressFill');
+  const pct = document.getElementById('pct');
+  let p = 0;
+  
+  const timer = setInterval(()=>{
+    if(p < 45) {
+      p++;
+      fill.style.width = p + '%';
+      pct.textContent = p + '%';
+    } else {
+      clearInterval(timer);
+    }
+  }, 50);
+})();
 </script>
-</body>
-</html>
+
+  <script>
+    (function(){
+      let p = 0;
+      const segs = document.querySelectorAll('.seg');
+      const pct = document.getElementById('pct');
+      
+      const interval = setInterval(()=>{
+        if(p < 45) {
+          p++;
+          const activeIdx = Math.floor((p / 45) * 8);
+          if(activeIdx < 8) {
+            segs[activeIdx].style.background = '#e3b341'; // Amber/Yellow
+          }
+          pct.textContent = p + '%';
+        } else {
+          clearInterval(interval);
+        }
+      }, 50);
+    })();
+  </script>
+</section>
+
+  </main></body></html>
