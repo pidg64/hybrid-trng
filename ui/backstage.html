@@ -85,19 +85,19 @@
 <main>
   <section class="card">
     <div class="step">1 · Input</div><h2>📷 Live feed (camera)</h2>
-    <p class="sub">We choose the frame (the camera). qiskit does NOT pick the frame — it picks pixels within it.</p>
+    <p class="sub">We get 30 FPS from a live-feed. </p>
     <div class="box"><img id="feed" alt="feed" style="display:none"/><div class="ph" id="feed-ph">Loading live feed…</div></div>
   </section>
 
   <section class="card">
     <div class="step">2 · Random window</div><h2>✂️ Frame → small random window</h2>
-    <p class="sub">We grab a small <b>random</b> 30×30-pixel window of the frame and lay a 30×30 grid on it — each cell is one real pixel (900 total).</p>
+    <p class="sub">We grab a small <b>random</b> 30×30-pixel window of the frame and index the pixels there. </p>
     <div class="box"><canvas id="cFrame" width="560" height="560"></canvas><div class="ph" id="cFrame-ph">Tap “Analyze live”.</div></div>
   </section>
 
   <section class="card">
     <div class="step">3 · Quantum selection</div><h2>🎯 32 cells qiskit picked</h2>
-    <p class="sub">Hadamard on 10 qubits → index 0–1023. Rejection sampling: if it lands ≥900 or repeats, discard and re-roll.</p>
+    <p class="sub">Qiskit-generated Hadamard circuits select uncorrelated pixel indices, while XOR whitening mitigates bias and strengthens entropy extraction. </p>
     <div class="box"><canvas id="cGrid" width="420" height="420"></canvas><div class="ph" id="cGrid-ph">waiting…</div></div>
   </section>
 
@@ -106,7 +106,7 @@
       <div>
         <div class="step">qiskit rolls (rejection sampling)</div>
         <h2>🎰 Quantum measurements</h2>
-        <p class="sub">Each roll is the 10 measured bits → index. Accepted ones in green, discarded ones dimmed.</p>
+        <p class="sub">Each measures qubits → maps to index. This manages to uncorrelate pixels. </p>
         <div class="rolls" id="rolls"><div class="ph">—</div></div>
       </div>
       <div>
